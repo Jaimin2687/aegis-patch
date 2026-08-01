@@ -85,16 +85,35 @@ setInterval(() => {
 }, CLEANUP_INTERVAL_MS).unref();   // .unref() so it doesn't prevent graceful shutdown
 // ─────────────────────────────────────────────────────────────────────
 
+// ── Security: CORS Origin Validator ─────────────────────────────────
+function isAllowedOrigin(origin) {
+  if (!origin) return false;
+  if (origin === config.FRONTEND_URL) return true;
+  if (origin.endsWith('.vercel.app')) return true;
+  if (origin.startsWith('http://localhost:')) return true;
+  return false;
+}
+
+// ── Security: Request Body Size Limit (1MB) ─────────────────────────
+const MAX_BODY_SIZE = 1 * 1024 * 1024; // 1MB
+
+const SERVER_START_TIME = Date.now();
+
 const server = http.createServer((req, res) => {
+  // ── Security Headers (OWASP Best Practices) ───────────────────────
   const origin = req.headers.origin;
-  const allowedOrigin = origin && (
-    origin === config.FRONTEND_URL ||
-    origin.endsWith('.vercel.app') ||
-    origin.startsWith('http://localhost:')
-  ) ? origin : (config.FRONTEND_URL || '*');
+  const allowedOrigin = isAllowedOrigin(origin) ? origin : config.FRONTEND_URL;
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400');                         // Cache preflight for 24h
+  res.setHeader('X-Content-Type-Options', 'nosniff');                       // Prevent MIME sniffing
+  res.setHeader('X-Frame-Options', 'DENY');                                 // Prevent clickjacking
+  res.setHeader('X-XSS-Protection', '1; mode=block');                       // Legacy XSS filter
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');      // Limit referrer leakage
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()'); // Disable unused APIs
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains'); // HSTS
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"); // CSP
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
@@ -112,13 +131,31 @@ const server = http.createServer((req, res) => {
     }
 
     let body = '';
-    req.on('data', chunk => body += chunk.toString());
+    let bodySize = 0;
+    let aborted = false;
+
+    req.on('data', chunk => {
+      bodySize += chunk.length;
+      if (bodySize > MAX_BODY_SIZE) {
+        aborted = true;
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Request body too large' }));
+        req.destroy();
+        return;
+      }
+      body += chunk.toString();
+    });
+
     req.on('end', () => {
+      if (aborted) return;
       try {
         const { repoUrl } = JSON.parse(body);
-        if (!repoUrl) {
+
+        // Input sanitization: only allow valid GitHub HTTPS URLs
+        const githubUrlPattern = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(\.git)?\/?$/;
+        if (!repoUrl || typeof repoUrl !== 'string' || !githubUrlPattern.test(repoUrl.trim())) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Invalid repoUrl' }));
+          res.end(JSON.stringify({ error: 'Invalid repoUrl. Only public GitHub HTTPS URLs are accepted.' }));
           return;
         }
 
@@ -161,8 +198,19 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(scanHistory.slice(0, 50)));
   } else if (req.method === 'GET' && req.url === '/health') {
+    const uptimeSeconds = Math.floor((Date.now() - SERVER_START_TIME) / 1000);
+    const mem = process.memoryUsage();
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'ok' }));
+    res.end(JSON.stringify({
+      status: 'ok',
+      uptime: `${Math.floor(uptimeSeconds / 60)}m ${uptimeSeconds % 60}s`,
+      memory: {
+        rss: `${Math.round(mem.rss / 1024 / 1024)}MB`,
+        heapUsed: `${Math.round(mem.heapUsed / 1024 / 1024)}MB`
+      },
+      activeSessions: clients.size,
+      timestamp: new Date().toISOString()
+    }));
   } else {
     res.writeHead(404);
     res.end();
@@ -173,11 +221,20 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 const clients = new Map();
 
 wss.on('connection', (ws, req) => {
+  // ── Security: Validate WebSocket origin ────────────────────────────
+  const wsOrigin = req.headers.origin;
+  if (wsOrigin && !isAllowedOrigin(wsOrigin)) {
+    ws.close(1008, 'Origin not allowed');
+    return;
+  }
+
   const urlParams = new URLSearchParams(req.url.split('?')[1]);
   const sessionId = urlParams.get('sessionId');
   
-  if (!sessionId) {
-    ws.close();
+  // Validate sessionId is a valid UUID v4 format
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!sessionId || !uuidPattern.test(sessionId)) {
+    ws.close(1008, 'Invalid session');
     return;
   }
 
