@@ -169,6 +169,8 @@ const server = http.createServer((req, res) => {
           date: new Date().toISOString(),
           status: 'running',
           vulnsFound: 0,
+          vulns: [],
+          logs: [],
           duration: null,
           prUrl: null,
           startTime: Date.now()
@@ -263,7 +265,14 @@ Object.values(EventTypes).forEach(eventType => {
     if (record) {
       if (eventType === EventTypes.VULN_FOUND) {
         record.vulnsFound++;
+        record.vulns = record.vulns || [];
+        record.vulns.push(eventData.data);
         saveHistory();
+      } else if (eventType === EventTypes.LOG) {
+        record.logs = record.logs || [];
+        if (record.logs.length < 200) {
+          record.logs.push(eventData.data);
+        }
       } else if (eventType === EventTypes.COMPLETE) {
         record.status = 'success';
         record.duration = eventData.data?.totalTime || `${((Date.now() - record.startTime) / 1000).toFixed(0)}s`;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GlowInput } from '@/components/ui/glow-input';
 import useWebSocket from '@/lib/useWebSocket';
@@ -10,12 +10,32 @@ import VulnCard from '@/app/components/VulnCard';
 import PrResult from '@/app/components/PrResult';
 
 export default function DashboardPage() {
-  const [repoUrl, setRepoUrl] = useState('');
-  const [pipelineStarted, setPipelineStarted] = useState(false);
+  const [repoUrl, setRepoUrl] = useState(() => {
+    if (typeof window !== 'undefined') return sessionStorage.getItem('aegis_repo_url') || '';
+    return '';
+  });
+  const [pipelineStarted, setPipelineStarted] = useState(() => {
+    if (typeof window !== 'undefined') return Boolean(sessionStorage.getItem('aegis_session_id'));
+    return false;
+  });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-  const { sessionId, stage, logs, vulns, result, error: wsError, connectionStatus, startSession } = useWebSocket();
+  const { sessionId, stage, logs, vulns, result, error: wsError, connectionStatus, startSession, clearSession } = useWebSocket();
+
+  // Keep pipelineStarted in sync if session ID exists
+  useEffect(() => {
+    if (sessionId) {
+      setPipelineStarted(true);
+    }
+  }, [sessionId]);
+
+  const handleStartNewScan = () => {
+    clearSession();
+    setPipelineStarted(false);
+    setRepoUrl('');
+    setSubmitError(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +51,8 @@ export default function DashboardPage() {
     setSubmitError(null);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      if (typeof window !== 'undefined') sessionStorage.setItem('aegis_repo_url', repoUrl);
+      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
       const res = await fetch(`${apiUrl}/api/patch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,7 +64,6 @@ export default function DashboardPage() {
       }
 
       const data = await res.json();
-      // Connect WebSocket using the backend's session ID
       startSession(data.sessionId);
       setPipelineStarted(true);
     } catch (err) {
@@ -65,9 +85,23 @@ export default function DashboardPage() {
 
   return (
     <div className="w-full h-full flex flex-col space-y-8 font-sans">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-white">Command Center</h1>
-        <p className="text-slate-400">Launch and monitor vulnerability patching pipelines.</p>
+      <header className="flex justify-between items-start flex-wrap gap-4">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-white">Command Center</h1>
+          <p className="text-slate-400">Launch and monitor vulnerability patching pipelines.</p>
+        </div>
+
+        {pipelineStarted && (
+          <button
+            onClick={handleStartNewScan}
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-white/15 text-slate-200 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-md hover:border-cyan-500/30"
+          >
+            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Start New Scan</span>
+          </button>
+        )}
       </header>
 
       <form onSubmit={handleSubmit} className="w-full max-w-2xl">
@@ -123,10 +157,10 @@ export default function DashboardPage() {
                   <p className="text-sm mt-1 opacity-80">{wsError}</p>
                 </div>
                 <button
-                  onClick={() => { setPipelineStarted(false); setSubmitError(null); setRepoUrl(''); }}
+                  onClick={handleStartNewScan}
                   className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-300 transition-colors font-medium"
                 >
-                  ↺ Retry
+                  ↺ Retry / Reset
                 </button>
               </motion.div>
             )}
@@ -148,7 +182,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <AnimatePresence>
                     {vulns.map((vuln) => (
-                      <VulnCard key={vuln.cveId || Math.random().toString()} vuln={vuln} />
+                      <VulnCard key={vuln.cveId || vuln.ghsaId || Math.random().toString()} vuln={vuln} />
                     ))}
                   </AnimatePresence>
                 </div>
