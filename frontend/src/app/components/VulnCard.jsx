@@ -12,7 +12,8 @@ export default function VulnCard({ vuln }) {
   const v = vuln || {};
   const cveId = v.cveId || v.ghsaId || 'UNKNOWN-CVE';
   const ghsaId = v.ghsaId || v.cveId;
-  const severity = (v.severity || 'MEDIUM').toUpperCase();
+  const severityRaw = (v.severity || 'MEDIUM').toUpperCase();
+  const severity = severityRaw === 'MODERATE' ? 'MEDIUM' : severityRaw;
   const description = v.description || v.vulnData?.details || v.title || 'No detailed vulnerability description available for this advisory.';
   const title = v.title || 'Security Vulnerability';
   const packageName = v.packageName || 'Unknown Package';
