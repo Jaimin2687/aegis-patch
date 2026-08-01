@@ -3,13 +3,15 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, useUser } from '@clerk/nextjs';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function DashboardLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user } = useUser();
+  const userName = user?.fullName || user?.firstName || 'User';
 
   const pathname = usePathname();
 
@@ -78,8 +80,8 @@ export default function DashboardLayout({ children }) {
         <div className={cn("flex items-center", collapsed ? "mx-auto" : "space-x-3")}>
           <UserButton afterSignOutUrl="/" appearance={{ elements: { userButtonAvatarBox: 'w-8 h-8 rounded-lg' } }} />
           {!collapsed && (
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-slate-200">User</span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-medium text-slate-200 truncate">{userName}</span>
               <span className="text-xs text-slate-500">Operator</span>
             </div>
           )}

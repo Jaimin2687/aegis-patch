@@ -12,7 +12,7 @@ export default function UrlInput({ onSubmit, isRunning }) {
       return;
     }
     
-    if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/.test(url.trim())) {
+    if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(\.git)?\/?$/.test(url.trim())) {
       setError('Must be a valid GitHub repository URL (e.g., https://github.com/user/repo)');
       return;
     }
@@ -24,7 +24,7 @@ export default function UrlInput({ onSubmit, isRunning }) {
   return (
     <div className="bg-[#0a0a0a]/50 backdrop-blur-[12px] border border-[#222] p-6 rounded-xl w-full max-w-3xl mb-8">
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <label className="text-sm font-medium text-[#ccc]">Target Repository</label>
+        <label htmlFor="repo-url" className="text-sm font-medium text-[#ccc]">Target Repository</label>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -33,9 +33,10 @@ export default function UrlInput({ onSubmit, isRunning }) {
               </svg>
             </div>
             <input
-              type="text"
+              id="repo-url"
+              type="url"
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              onChange={(e) => { setUrl(e.target.value); setError(''); }}
               disabled={isRunning}
               placeholder="https://github.com/organization/repository"
               className={`w-full pl-10 pr-4 py-2.5 bg-[#0a0a0a] border ${error ? 'border-red-500' : 'border-[#333] focus:border-[#555]'} rounded-md text-white placeholder-[#666] outline-none transition-colors disabled:opacity-50`}

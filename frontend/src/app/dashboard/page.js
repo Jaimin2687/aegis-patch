@@ -14,16 +14,22 @@ export default function DashboardPage() {
   const [pipelineStarted, setPipelineStarted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
-  
+
   const { sessionId, stage, logs, vulns, result, error: wsError, connectionStatus, startSession } = useWebSocket();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!repoUrl) return;
-    
+    if (!repoUrl.trim()) return;
+
+    // Validate GitHub URL format
+    if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(\.git)?\/?$/.test(repoUrl.trim())) {
+      setSubmitError('Please enter a valid GitHub repository URL (e.g., https://github.com/user/repo)');
+      return;
+    }
+
     setSubmitting(true);
     setSubmitError(null);
-    
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
       const res = await fetch(`${apiUrl}/api/patch`, {
@@ -31,11 +37,11 @@ export default function DashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ repoUrl })
       });
-      
+
       if (!res.ok) {
         throw new Error('Failed to start pipeline');
       }
-      
+
       const data = await res.json();
       // Connect WebSocket using the backend's session ID
       startSession(data.sessionId);
@@ -67,7 +73,7 @@ export default function DashboardPage() {
       <form onSubmit={handleSubmit} className="w-full max-w-2xl">
         <GlowInput
           value={repoUrl}
-          onChange={(e) => setRepoUrl(e.target.value)}
+          onChange={(e) => { setRepoUrl(e.target.value); setSubmitError(null); }}
           onSubmit={handleSubmit}
           placeholder="https://github.com/username/repository"
           isLoading={submitting}
@@ -104,7 +110,7 @@ export default function DashboardPage() {
             className="flex-1 flex flex-col space-y-8 pb-12"
           >
             <motion.div variants={itemVariants}>
-              <StatusPanel currentStage={stage} />
+              <StatusPanel currentStage={stage} isError={!!wsError} />
             </motion.div>
 
             {wsError && (
@@ -116,6 +122,12 @@ export default function DashboardPage() {
                   <h4 className="font-semibold">Pipeline Error</h4>
                   <p className="text-sm mt-1 opacity-80">{wsError}</p>
                 </div>
+                <button
+                  onClick={() => { setPipelineStarted(false); setSubmitError(null); setRepoUrl(''); }}
+                  className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-300 transition-colors font-medium"
+                >
+                  ↺ Retry
+                </button>
               </motion.div>
             )}
 
