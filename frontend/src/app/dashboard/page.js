@@ -22,8 +22,13 @@ export default function DashboardPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-  // GitHub PAT Instructions Note state
+  // GitHub PAT Guide & Quick Token Input state
   const [showPatGuide, setShowPatGuide] = useState(true);
+  const [userPat, setUserPat] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('aegis_github_token') || '';
+    return '';
+  });
+  const [patSaved, setPatSaved] = useState(false);
 
   // Vulnerability search & severity filtering state
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,6 +42,14 @@ export default function DashboardPage() {
       setPipelineStarted(true);
     }
   }, [sessionId]);
+
+  const handleSavePat = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('aegis_github_token', userPat.trim());
+    }
+    setPatSaved(true);
+    setTimeout(() => setPatSaved(false), 3000);
+  };
 
   const handleStartNewScan = () => {
     clearSession();
@@ -66,7 +79,7 @@ export default function DashboardPage() {
       const res = await fetch(`${apiUrl}/api/patch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ repoUrl })
+        body: JSON.stringify({ repoUrl, token: userPat.trim() || undefined })
       });
 
       if (!res.ok) {
@@ -150,12 +163,12 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={() => setShowPatGuide(!showPatGuide)}
-            className="px-3.5 py-2 bg-indigo-950/60 hover:bg-indigo-900/80 border border-indigo-500/40 text-indigo-300 hover:text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md"
+            className="px-3.5 py-2 bg-slate-900/90 hover:bg-slate-800 border border-white/15 text-slate-300 hover:text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-md hover:border-cyan-500/40"
           >
             <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
             </svg>
-            <span>{showPatGuide ? 'Hide GitHub PAT Guide' : 'GitHub Token Guide'}</span>
+            <span>{showPatGuide ? 'Hide Token Setup' : 'GitHub Token Guide'}</span>
           </button>
 
           {pipelineStarted && (
@@ -186,7 +199,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* ─── GitHub Integration Personal Access Token Note Card ─── */}
+      {/* ─── Premium GitHub Integration Personal Access Token Note Card ─── */}
       <AnimatePresence>
         {showPatGuide && (
           <motion.div
@@ -194,34 +207,38 @@ export default function DashboardPage() {
             animate={{ opacity: 1, height: 'auto', y: 0 }}
             exit={{ opacity: 0, height: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="w-full bg-gradient-to-r from-indigo-950/80 via-slate-900/90 to-purple-950/80 border border-indigo-500/30 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden space-y-4"
+            className="w-full bg-[#0c0e14] border border-cyan-500/25 rounded-2xl p-6 shadow-2xl shadow-cyan-950/20 relative overflow-hidden space-y-5"
           >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+            {/* Subtle Gradient Glow Corner */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
+            {/* Header Bar */}
             <div className="flex justify-between items-start gap-4 relative z-10">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="p-1.5 bg-indigo-500/20 border border-indigo-500/30 rounded-lg text-cyan-400">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                    </svg>
-                  </span>
-                  <h3 className="text-base font-bold text-white tracking-tight">
-                    GitHub Integration & Personal Access Token (PAT) Note
-                  </h3>
-                  <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/30">
-                    Required for PR Creation
-                  </span>
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-cyan-500/15 border border-cyan-500/30 rounded-xl text-cyan-400 shrink-0">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                  </svg>
                 </div>
-                <p className="text-xs text-slate-300 max-w-2xl">
-                  AEGIS-PATCH requires a GitHub Personal Access Token (PAT) with write permissions to push patch branches and open Pull Requests on your repository.
-                </p>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-lg font-bold text-white tracking-tight">
+                      GitHub Personal Access Token (PAT) Setup
+                    </h3>
+                    <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40">
+                      Required for Pull Requests
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                    AEGIS-PATCH uses your Personal Access Token to commit fix branches and open Pull Requests. Follow the 3 steps below to set up your token:
+                  </p>
+                </div>
               </div>
 
               <button
                 onClick={() => setShowPatGuide(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors shrink-0"
-                aria-label="Close note"
+                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors shrink-0"
+                aria-label="Close setup guide"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -229,72 +246,83 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            {/* Step-by-step Quick Instructions */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative z-10 text-xs">
-              <div className="bg-slate-950/70 border border-white/10 p-3.5 rounded-xl space-y-1">
-                <div className="font-semibold text-cyan-400 flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-[11px] font-bold">1</span>
-                  <span>Generate PAT</span>
+            {/* 3 Step Instruction Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 relative z-10">
+              {/* Step 1 */}
+              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-cyan-500/30 transition-colors">
+                <div className="flex items-center gap-2 text-xs font-bold text-cyan-400">
+                  <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-[11px]">1</span>
+                  <span>Generate Token</span>
                 </div>
-                <p className="text-slate-400">
-                  Open <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline font-medium">GitHub Developer Settings</a> to generate a Fine-grained Token.
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline font-medium">GitHub Developer Settings</a> to create a Fine-grained Token.
                 </p>
               </div>
 
-              <div className="bg-slate-950/70 border border-white/10 p-3.5 rounded-xl space-y-1">
-                <div className="font-semibold text-indigo-400 flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-[11px] font-bold">2</span>
+              {/* Step 2 */}
+              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-indigo-500/30 transition-colors">
+                <div className="flex items-center gap-2 text-xs font-bold text-indigo-400">
+                  <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-[11px]">2</span>
                   <span>Set Permissions</span>
                 </div>
-                <p className="text-slate-400">
-                  Under <em>Repository Permissions</em>, set both <strong className="text-emerald-400">Contents</strong> & <strong className="text-emerald-400">Pull Requests</strong> to <em>Read & write</em>.
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Under <em>Repository Permissions</em>, grant <strong className="text-emerald-400">Read & write</strong> for both <strong className="text-white">Contents</strong> and <strong className="text-white">Pull requests</strong>.
                 </p>
               </div>
 
-              <div className="bg-slate-950/70 border border-white/10 p-3.5 rounded-xl space-y-1">
-                <div className="font-semibold text-emerald-400 flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-[11px] font-bold">3</span>
-                  <span>Save Token</span>
+              {/* Step 3 */}
+              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-emerald-500/30 transition-colors">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-[11px]">3</span>
+                  <span>Paste or Save Token</span>
                 </div>
-                <p className="text-slate-400">
-                  Save token in <code className="text-cyan-300 font-mono">backend/.env</code> under <code className="text-cyan-300 font-mono">GITHUB_TOKEN</code> or configure in Settings.
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Paste your PAT (<code className="text-cyan-300 font-mono">github_pat_...</code>) in the input below or add to <code className="text-cyan-300 font-mono">backend/.env</code>.
                 </p>
               </div>
             </div>
 
-            {/* Quick Action Bar */}
-            <div className="flex items-center justify-between gap-4 pt-1 border-t border-white/10 relative z-10 flex-wrap">
-              <div className="flex items-center gap-3">
+            {/* Quick PAT Input & Actions */}
+            <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 relative z-10">
+              <div className="flex items-center gap-2 flex-1 max-w-xl">
+                <input
+                  type="password"
+                  value={userPat}
+                  onChange={(e) => setUserPat(e.target.value)}
+                  placeholder="Paste your GitHub Personal Access Token (github_pat_...)"
+                  className="flex-1 bg-black/80 border border-white/15 focus:border-cyan-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 font-mono outline-none transition-colors"
+                />
+                <button
+                  onClick={handleSavePat}
+                  className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-black font-semibold text-xs rounded-xl shadow-md transition-all shrink-0 active:scale-95"
+                >
+                  {patSaved ? '✓ Saved!' : 'Save PAT'}
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3 justify-end shrink-0">
                 <a
                   href="https://github.com/settings/tokens?type=beta"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-1.5 bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs rounded-lg transition-all flex items-center gap-1 shadow-md shadow-cyan-500/20"
+                  className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-white/15 text-cyan-300 hover:text-white text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
                 >
-                  <span>Generate Token on GitHub</span>
+                  <span>Generate on GitHub</span>
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
                 </a>
-
                 <Link
                   href="/dashboard/settings"
-                  className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-white/15 text-slate-200 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1"
+                  className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-white/15 text-slate-300 hover:text-white text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
                 >
                   <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>Configure Token in Settings</span>
+                  <span>Settings</span>
                 </Link>
               </div>
-
-              <button
-                onClick={() => setShowPatGuide(false)}
-                className="text-xs text-slate-400 hover:text-slate-200 transition-colors"
-              >
-                Dismiss Note
-              </button>
             </div>
           </motion.div>
         )}
