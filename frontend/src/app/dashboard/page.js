@@ -203,17 +203,14 @@ export default function DashboardPage() {
       <AnimatePresence>
         {showPatGuide && (
           <motion.div
-            initial={{ opacity: 0, height: 0, y: -10 }}
-            animate={{ opacity: 1, height: 'auto', y: 0 }}
-            exit={{ opacity: 0, height: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="w-full bg-[#0c0e14] border border-cyan-500/25 rounded-2xl p-6 shadow-2xl shadow-cyan-950/20 relative overflow-hidden space-y-5"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="w-full bg-[#0c0e14] border border-cyan-500/25 rounded-2xl p-6 shadow-2xl shadow-cyan-950/20 space-y-5 relative"
           >
-            {/* Subtle Gradient Glow Corner */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
             {/* Header Bar */}
-            <div className="flex justify-between items-start gap-4 relative z-10">
+            <div className="flex justify-between items-start gap-4">
               <div className="flex items-start gap-3">
                 <div className="p-2.5 bg-cyan-500/15 border border-cyan-500/30 rounded-xl text-cyan-400 shrink-0">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -247,43 +244,49 @@ export default function DashboardPage() {
             </div>
 
             {/* 3 Step Instruction Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
               {/* Step 1 */}
-              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-cyan-500/30 transition-colors">
-                <div className="flex items-center gap-2 text-xs font-bold text-cyan-400">
-                  <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-[11px]">1</span>
-                  <span>Generate Token</span>
+              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-cyan-500/30 transition-colors flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-[11px]">1</span>
+                    <span>Generate Token</span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline font-medium">GitHub Developer Settings</a> to create a Fine-grained Token.
+                  </p>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline font-medium">GitHub Developer Settings</a> to create a Fine-grained Token.
-                </p>
               </div>
 
               {/* Step 2 */}
-              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-indigo-500/30 transition-colors">
-                <div className="flex items-center gap-2 text-xs font-bold text-indigo-400">
-                  <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-[11px]">2</span>
-                  <span>Set Permissions</span>
+              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-indigo-500/30 transition-colors flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-indigo-400 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-[11px]">2</span>
+                    <span>Set Permissions</span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Under <em>Repository Permissions</em>, grant <strong className="text-emerald-400">Read & write</strong> for both <strong className="text-white">Contents</strong> and <strong className="text-white">Pull requests</strong>.
+                  </p>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Under <em>Repository Permissions</em>, grant <strong className="text-emerald-400">Read & write</strong> for both <strong className="text-white">Contents</strong> and <strong className="text-white">Pull requests</strong>.
-                </p>
               </div>
 
               {/* Step 3 */}
-              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-emerald-500/30 transition-colors">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
-                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-[11px]">3</span>
-                  <span>Paste or Save Token</span>
+              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-emerald-500/30 transition-colors flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-[11px]">3</span>
+                    <span>Paste or Save Token</span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Paste your PAT (<code className="text-cyan-300 font-mono">github_pat_...</code>) in the input below or add to <code className="text-cyan-300 font-mono">backend/.env</code>.
+                  </p>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Paste your PAT (<code className="text-cyan-300 font-mono">github_pat_...</code>) in the input below or add to <code className="text-cyan-300 font-mono">backend/.env</code>.
-                </p>
               </div>
             </div>
 
             {/* Quick PAT Input & Actions */}
-            <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 relative z-10">
+            <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2 flex-1 max-w-xl">
                 <input
                   type="password"
