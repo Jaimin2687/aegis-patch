@@ -298,7 +298,7 @@ export default function ScanHistoryPage() {
                 {selectedScan.logs && selectedScan.logs.length > 0 && (
                   <div className="space-y-3 pt-2">
                     <button
-                      onClick={() => setShowLogs(!showLogs)}
+                      onClick={() => setShowLogs((v) => !v)}
                       className="text-xs text-slate-400 hover:text-white flex items-center gap-2 font-medium transition-colors"
                     >
                       <svg className={`w-4 h-4 transform transition-transform ${showLogs ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
