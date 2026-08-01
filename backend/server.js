@@ -86,7 +86,13 @@ setInterval(() => {
 // ─────────────────────────────────────────────────────────────────────
 
 const server = http.createServer((req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', config.FRONTEND_URL || '*');
+  const origin = req.headers.origin;
+  const allowedOrigin = origin && (
+    origin === config.FRONTEND_URL ||
+    origin.endsWith('.vercel.app') ||
+    origin.startsWith('http://localhost:')
+  ) ? origin : (config.FRONTEND_URL || '*');
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 

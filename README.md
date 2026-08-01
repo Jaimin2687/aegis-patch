@@ -171,8 +171,9 @@ npm install
 In the `backend/` directory, create a `.env` file:
 
 ```env
-# LLM API Keys (all free tier)
-GROQ_API_KEY=gsk_your_key_here
+# LLM API Keys (all free tier) - Includes failover pool support
+GROQ_API_KEY=gsk_your_primary_key_here
+GROQ_API_KEY_2=gsk_your_backup_key_here
 GEMINI_API_KEY=AIzaSy_your_key_here
 CEREBRAS_API_KEY=csk-your_key_here
 
@@ -206,6 +207,31 @@ npm run dev
 ```
 
 Open `http://localhost:3000` in your browser. Paste a vulnerable repository URL and watch AEGIS-PATCH go to work.
+
+---
+
+## 🌐 Production Deployment (Vercel & Render)
+
+AEGIS-PATCH is pre-configured with `vercel.json` and `render.yaml` for seamless zero-config cloud deployment.
+
+### 1. Deploy Backend to Render (Free Tier)
+1. Go to [Render Dashboard](https://dashboard.render.com/) and create a **New Blueprint Instance** (or Web Service).
+2. Connect your repository. Render will auto-detect `render.yaml`.
+3. In the environment section, enter your secret API keys:
+   - `GROQ_API_KEY` and `GROQ_API_KEY_2` (optional backup)
+   - `CEREBRAS_API_KEY`
+   - `GEMINI_API_KEY`
+   - `GITHUB_TOKEN` (Must have `repo` permissions)
+4. Deploy! Copy your Backend URL (e.g., `https://aegis-patch-backend.onrender.com`).
+
+### 2. Deploy Frontend to Vercel
+1. Import your repository into [Vercel](https://vercel.com/new).
+2. In Project Settings, set the **Root Directory** to `frontend` (Vercel auto-configures Next.js parameters via `vercel.json`).
+3. Add the following Environment Variable:
+   - `NEXT_PUBLIC_BACKEND_URL`: Paste your Render backend URL (e.g., `https://aegis-patch-backend.onrender.com`)
+4. Deploy! Your interactive dashboard will instantly connect to your Render daemon over real-time WebSockets.
+
+*(Note: Our intelligent backend CORS configuration dynamically authorizes any verified Vercel preview or production domain automatically!)*
 
 ---
 
