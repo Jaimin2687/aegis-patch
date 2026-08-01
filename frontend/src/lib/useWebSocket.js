@@ -8,7 +8,7 @@ export default function useWebSocket() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('CLOSED');
-  
+
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
@@ -28,12 +28,12 @@ export default function useWebSocket() {
 
     const connect = () => {
       setConnectionStatus('CONNECTING');
-      
+
       let backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
       backendUrl = backendUrl.replace(/\/+$/, '');
       // Backend expects: ws://host:port/ws?sessionId=xxx
       const wsUrl = backendUrl.replace(/^http/, 'ws') + `/ws?sessionId=${sessionId}`;
-      
+
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
@@ -45,7 +45,7 @@ export default function useWebSocket() {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          
+
           if (data.type === 'LOG') {
             // Backend sends: { type, sessionId, timestamp, stage, level, message, data }
             // The log IS the top-level object, not nested in .data
@@ -90,10 +90,10 @@ export default function useWebSocket() {
         setConnectionStatus('CLOSED');
         // Do not reconnect if completed or clean close
         if (stageRef.current === 'COMPLETE' || event.code === 1000) return;
-        
+
         const timeout = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
         reconnectAttemptsRef.current += 1;
-        
+
         reconnectTimeoutRef.current = setTimeout(() => {
           connect();
         }, timeout);

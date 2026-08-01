@@ -155,3 +155,71 @@ body {
   background: #0a0a0a;
   border-radius: 11px;
 }
+
+/* ─── Clerk Dark Mode Overrides ─── */
+.cl-userButtonPopoverCard,
+.cl-userProfile-root,
+.cl-profilePage,
+.cl-navbar,
+.cl-pageScrollBox {
+  background-color: #111111 !important;
+  color: #ffffff !important;
+}
+
+.cl-userButtonPopoverCard *,
+.cl-userProfile-root * {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Aggressively force text colors in the modal */
+.cl-userProfile-root h1,
+.cl-userProfile-root h2,
+.cl-userProfile-root h3,
+.cl-userProfile-root h4 {
+  color: #ffffff !important;
+}
+
+.cl-userProfile-root p,
+.cl-userProfile-root span:not(.cl-badge),
+.cl-userProfile-root div,
+.cl-userProfile-root svg {
+  color: #d1d5db; /* slate-300 */
+}
+
+/* Ensure active nav items and main titles are bright white */
+.cl-userPreviewMainIdentifier,
+.cl-profileSectionTitle,
+.cl-profileSectionTitleText,
+.cl-headerTitle,
+.cl-breadcrumbsItem,
+.cl-navbarButton.cl-active,
+.cl-userButtonPopoverActionButtonText {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+/* Explicit exceptions for primary and danger buttons */
+.cl-userProfile-root button.cl-profileSectionPrimaryButton {
+  color: #22d3ee !important; /* cyan-400 */
+}
+
+.cl-userProfile-root .cl-danger {
+  color: #ef4444 !important; /* red-500 */
+}
+
+.cl-userPreviewSecondaryIdentifier,
+.cl-headerSubtitle,
+.cl-profileSectionSubtitle,
+.cl-userButtonPopoverActionButtonIcon,
+.cl-userButtonPopoverFooterPages {
+  color: #bbbbbb !important;
+}
+
+.cl-navbarButton.cl-active {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-navbarButton:hover,
+.cl-userButtonPopoverActionButton:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
