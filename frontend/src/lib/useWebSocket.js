@@ -47,24 +47,36 @@ export default function useWebSocket() {
           const data = JSON.parse(event.data);
           
           if (data.type === 'LOG') {
-            setLogs(prev => [...prev, data.data].slice(-1000));
-            if (data.data?.stage && data.data.stage !== stageRef.current) {
-              stageRef.current = data.data.stage;
-              setStage(data.data.stage);
+            // Backend sends: { type, sessionId, timestamp, stage, level, message, data }
+            // The log IS the top-level object, not nested in .data
+            const logEntry = {
+              timestamp: data.timestamp,
+              stage: data.stage,
+              level: data.level,
+              message: data.message,
+            };
+            setLogs(prev => [...prev, logEntry].slice(-1000));
+            if (data.stage && data.stage !== stageRef.current) {
+              stageRef.current = data.stage;
+              setStage(data.stage);
             }
-          } else if (data.type === 'STAGE') {
-            stageRef.current = data.stage || data.data?.stage || '';
+          } else if (data.type === 'STAGE_CHANGE') {
+            // Backend sends: { type, sessionId, from, to }
+            stageRef.current = data.to || '';
             setStage(stageRef.current);
           } else if (data.type === 'VULN_FOUND') {
+            // Backend sends: { type, sessionId, data: { cveId, ... } }
             setVulns(prev => {
-              if (prev.some(v => v.cveId === data.data?.cveId)) return prev;
-              return [...prev, data.data];
+              const vuln = data.data;
+              if (!vuln) return prev;
+              if (prev.some(v => v.cveId === vuln.cveId)) return prev;
+              return [...prev, vuln];
             });
-          } else if (data.type === 'RESULT') {
-            setResult(data.data);
           } else if (data.type === 'ERROR') {
-            setError(data.data?.message || data.message || 'Pipeline error');
+            // Backend sends: { type, sessionId, message, stage, fatal }
+            setError(data.message || 'Pipeline error');
           } else if (data.type === 'COMPLETE') {
+            // Backend sends: { type, sessionId, data: { ... } }
             stageRef.current = 'COMPLETE';
             setStage('COMPLETE');
             if (data.data) setResult(data.data);
