@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: aegis-patch-backend
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CEREBRAS_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: FRONTEND_URL
+        value: https://aegis-patch.vercel.app
+      - key: PORT
+        value: 3001
+      - key: NODE_ENV
+        value: production

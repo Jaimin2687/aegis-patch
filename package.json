@@ -1,0 +1,15 @@
+{
+  "name": "aegis-patch",
+  "version": "1.0.0",
+  "description": "Autonomous Software Supply Chain Vulnerability Patching Engine",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && node server.js",
+    "dev:frontend": "cd frontend && npm run dev"
+  }
+}

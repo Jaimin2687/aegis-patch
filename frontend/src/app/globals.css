@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+:root {
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-charcoal-deep: #050505;
+  --color-charcoal: #0a0a0a;
+  --color-slate: #111111;
+  --color-grid-line: #222222;
+  --color-muted: #888888;
+  --color-emerald: #10b981;
+  --color-indigo: #6366f1;
+  --color-red: #ef4444;
+  --color-amber: #f59e0b;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+/* Selection */
+::selection {
+  background: var(--color-indigo);
+  color: var(--color-white);
+}
+
+/* Glassmorphism */
+.glass-panel {
+  background: rgba(10, 10, 10, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Terminal Colors */
+.log-info { color: var(--color-white); }
+.log-warn { color: var(--color-amber); }
+.log-error { color: var(--color-red); }
+.log-success { color: var(--color-emerald); }
+.log-debug { color: var(--color-indigo); }
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+  50% { box-shadow: 0 0 10px 2px rgba(99, 102, 241, 0.5); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s infinite;
+}
