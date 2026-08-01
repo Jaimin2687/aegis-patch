@@ -3,7 +3,7 @@
  * @param {Object} args - Prompt arguments
  * @returns {Array} Array of message objects
  */
-export function buildPatchPrompt({ vulnerableCode, cveId, cweType, cveDescription, fixCommitDiff, language = 'javascript' }) {
+export function buildPatchPrompt({ vulnerableCode, cveId, cweType, cveDescription, fixCommitDiff, language = 'javascript', ecosystem = 'npm' }) {
   return [
     {
       role: 'system',
@@ -22,7 +22,7 @@ Constraints:
 - Return ONLY the patched source code, no explanations or markdown backticks.
 ${fixCommitDiff ? `\nReference fix diff:\n${fixCommitDiff}` : ''}
 
-Vulnerable ${language} Code:
+Vulnerable ${language} Code (${ecosystem} ecosystem):
 ${vulnerableCode}`
     }
   ];
@@ -33,7 +33,7 @@ ${vulnerableCode}`
  * @param {Object} args - Prompt arguments
  * @returns {Array} Array of message objects
  */
-export function buildRetryPrompt({ previousPatch, stderrOutput, cveId, cweType }) {
+export function buildRetryPrompt({ previousPatch, stderrOutput, cveId, cweType, language = 'javascript', ecosystem = 'npm' }) {
   return [
     {
       role: 'system',
@@ -43,7 +43,7 @@ export function buildRetryPrompt({ previousPatch, stderrOutput, cveId, cweType }
       role: 'user',
       content: `The previous patch for CVE ${cveId} (CWE: ${cweType}) failed regression tests. 
 
-Here is the previous patch:
+Here is the previous patch (${language}, ${ecosystem}):
 ${previousPatch}
 
 Here is the test failure output:

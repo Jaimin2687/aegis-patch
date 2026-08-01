@@ -40,6 +40,10 @@ export async function generatePR(repoPath, repoUrl, vulnReports, regressionResul
 
   const octokit = new Octokit({ auth: config.GITHUB_TOKEN });
   
+  // Fetch default branch to avoid "base: invalid" error
+  const repoData = await octokit.rest.repos.get({ owner, repo });
+  const defaultBranch = repoData.data.default_branch || 'main';
+  
   const cveList = vulnReports.map(v => `- **${v.packageName}**: ${v.cveId} (${v.title})`).join('\n');
   const body = `### AEGIS-PATCH Security Fixes
 
@@ -56,7 +60,7 @@ Please review the changes carefully.`;
     repo,
     title: 'Security Patch: Vulnerability Fixes',
     head: branchName,
-    base: 'main',
+    base: defaultBranch,
     body
   });
 

@@ -19,12 +19,13 @@ const config = {
   LLM: {
     GROQ: {
       API_KEY: process.env.GROQ_API_KEY,
-      MODEL: process.env.GROQ_MODEL || 'qwen-2.5-coder-32b',
+      API_KEY_2: process.env.GROQ_API_KEY_2,
+      MODEL: process.env.GROQ_MODEL || 'qwen/qwen3.6-27b',
       ENDPOINT: 'https://api.groq.com/openai/v1/chat/completions',
     },
     CEREBRAS: {
       API_KEY: process.env.CEREBRAS_API_KEY,
-      MODEL: process.env.CEREBRAS_MODEL || 'llama-3.3-70b',
+      MODEL: process.env.CEREBRAS_MODEL || 'gpt-oss-120b',
       ENDPOINT: 'https://api.cerebras.ai/v1/chat/completions',
     },
     GEMINI: {

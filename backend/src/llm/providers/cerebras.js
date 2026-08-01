@@ -2,7 +2,7 @@ import { request } from 'undici';
 import { RateLimitError, ProviderError } from './groq.js';
 
 export class CerebrasProvider {
-  constructor({ apiKey, model = 'llama-3.3-70b', endpoint = 'https://api.cerebras.ai/v1/chat/completions' }) {
+  constructor({ apiKey, model = 'gpt-oss-120b', endpoint = 'https://api.cerebras.ai/v1/chat/completions' }) {
     this.name = 'cerebras';
     this.apiKey = apiKey;
     this.model = model;

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "6120ec38-14b9-46b9-8bd6-f72049cdacd9",
+    "repo": " https://github.com/Jaimin2687/test-vuln-repo",
+    "repoUrl": " https://github.com/Jaimin2687/test-vuln-repo",
+    "date": "2026-08-01T09:16:14.026Z",
+    "status": "success",
+    "vulnsFound": 2,
+    "duration": "22.4s",
+    "prUrl": "https://github.com/Jaimin2687/test-vuln-repo/pull/1",
+    "startTime": 1785575774026
+  },
+  {
+    "id": "6a2e43ae-23a0-4621-9e81-4684d7011997",
+    "repo": " https://github.com/Jaimin2687/test-vuln-repo",
+    "repoUrl": " https://github.com/Jaimin2687/test-vuln-repo",
+    "date": "2026-08-01T09:12:17.963Z",
+    "status": "success",
+    "vulnsFound": 0,
+    "duration": "27.462s",
+    "prUrl": null,
+    "startTime": 1785575537963
+  },
+  {
+    "id": "23d268e6-c758-426e-8df8-7f204d1f111d",
+    "repo": "Jaimin2687/test-vuln-repo",
+    "repoUrl": "https://github.com/Jaimin2687/test-vuln-repo",
+    "date": "2026-08-01T09:04:49.886Z",
+    "status": "error",
+    "vulnsFound": 2,
+    "duration": "8s",
+    "prUrl": null,
+    "startTime": 1785575089886
+  },
+  {
+    "id": "97d358bb-7eff-4072-97cf-1c3355dc3308",
+    "repo": "/Users/jaimin/R2/test-vuln-repo",
+    "repoUrl": "/Users/jaimin/R2/test-vuln-repo",
+    "date": "2026-08-01T09:02:12.118Z",
+    "status": "error",
+    "vulnsFound": 2,
+    "duration": "11s",
+    "prUrl": null,
+    "startTime": 1785574932118
+  },
+  {
+    "id": "0129eb78-424e-4b66-934c-1b6c8ca6dfbd",
+    "repo": "Jaimin2687/Shadow-Hunt",
+    "repoUrl": "https://github.com/Jaimin2687/Shadow-Hunt",
+    "date": "2026-08-01T08:55:22.845Z",
+    "status": "success",
+    "vulnsFound": 0,
+    "duration": "5.787s",
+    "prUrl": null,
+    "startTime": 1785574522845
+  }
+]

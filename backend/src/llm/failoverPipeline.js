@@ -16,7 +16,7 @@ export class FailoverPipeline {
         name: 'groq-qwen',
         provider: new GroqProvider({
           apiKey: config.LLM.GROQ.API_KEY,
-          model: config.LLM.GROQ.MODEL || 'qwen-2.5-coder-32b',
+          model: config.LLM.GROQ.MODEL || 'qwen/qwen3.6-27b',
           endpoint: config.LLM.GROQ.ENDPOINT
         })
       });
@@ -29,13 +29,24 @@ export class FailoverPipeline {
         })
       });
     }
+    
+    if (config.LLM?.GROQ?.API_KEY_2) {
+      this.providers.push({
+        name: 'groq-2',
+        provider: new GroqProvider({
+          apiKey: config.LLM.GROQ.API_KEY_2,
+          model: config.LLM.GROQ.MODEL || 'qwen/qwen3.6-27b',
+          endpoint: config.LLM.GROQ.ENDPOINT
+        })
+      });
+    }
 
     if (config.LLM?.CEREBRAS?.API_KEY) {
       this.providers.push({
         name: 'cerebras',
         provider: new CerebrasProvider({
           apiKey: config.LLM.CEREBRAS.API_KEY,
-          model: config.LLM.CEREBRAS.MODEL || 'llama-3.3-70b',
+          model: config.LLM.CEREBRAS.MODEL || 'gpt-oss-120b',
           endpoint: config.LLM.CEREBRAS.ENDPOINT
         })
       });
@@ -59,9 +70,10 @@ export class FailoverPipeline {
   /**
    * Tries to generate content using providers sequentially based on failover logic
    * @param {Array} messages - Chat messages array
+   * @param {Object} options - Options for generation (e.g., format: 'json')
    * @returns {Promise<Object>} Output content and metadata
    */
-  async generate(messages) {
+  async generate(messages, options = {}) {
     let attempts = 0;
     
     for (let i = 0; i < this.providers.length; i++) {
@@ -77,6 +89,15 @@ export class FailoverPipeline {
           let content = result.content;
           // Strip markdown fences
           content = content.replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
+
+          // If JSON format is requested, validate it before returning
+          if (options.format === 'json') {
+             try {
+               JSON.parse(content);
+             } catch (e) {
+               throw new Error(`Invalid JSON returned by ${name}: ${e.message}`);
+             }
+          }
 
           return {
             content,
@@ -100,6 +121,6 @@ export class FailoverPipeline {
       }
     }
 
-    throw new Error('All LLM providers failed to generate patch');
+    throw new Error('All LLM providers failed to generate valid response');
   }
 }

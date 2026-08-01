@@ -19,7 +19,7 @@ export class ProviderError extends Error {
 }
 
 export class GroqProvider {
-  constructor({ apiKey, model = 'qwen-2.5-coder-32b', endpoint = 'https://api.groq.com/openai/v1/chat/completions' }) {
+  constructor({ apiKey, model = 'qwen/qwen3.6-27b', endpoint = 'https://api.groq.com/openai/v1/chat/completions' }) {
     this.name = 'groq';
     this.apiKey = apiKey;
     this.model = model;

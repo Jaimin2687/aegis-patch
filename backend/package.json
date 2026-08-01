@@ -9,14 +9,17 @@
     "dev": "node --watch server.js"
   },
   "dependencies": {
-    "simple-git": "^3.27.0",
     "@octokit/rest": "^21.1.1",
-    "ws": "^8.18.0",
     "dotenv": "^16.4.7",
+    "simple-git": "^3.27.0",
+    "undici": "^7.3.0",
     "uuid": "^11.1.0",
-    "undici": "^7.3.0"
+    "ws": "^8.18.0"
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2"
   }
 }

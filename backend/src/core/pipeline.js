@@ -16,17 +16,17 @@ import config from './config.js';
 export async function executePipeline(repoUrl, sessionId) {
   const logger = createLogger(sessionId);
   const startTime = Date.now();
-  let repoPath, lockfileData, packageJson;
+  let repoPath, lockfileData, packageJson, ecosystem;
   let failoverPipeline;
   
   try {
     failoverPipeline = new FailoverPipeline(sessionId);
     
     eventBus.emitStageChange(sessionId, null, 'CLONING');
-    ({ repoPath, lockfileData, packageJson } = await ingestRepo(repoUrl, sessionId));
+    ({ repoPath, lockfileData, packageJson, ecosystem } = await ingestRepo(repoUrl, sessionId));
     
     eventBus.emitStageChange(sessionId, 'CLONING', 'SCANNING');
-    const vulns = await scanVulnerabilities(repoPath, lockfileData, sessionId);
+    const vulns = await scanVulnerabilities(repoPath, lockfileData, ecosystem, failoverPipeline, sessionId);
     
     if (vulns.length === 0) {
       eventBus.emitComplete(sessionId, { patchedVulns: 0, totalTime: `${(Date.now() - startTime) / 1000}s` });
@@ -44,10 +44,10 @@ export async function executePipeline(repoUrl, sessionId) {
       for (let attempt = 1; attempt <= config.MAX_RETRIES; attempt++) {
         logger.info('PATCHING', `Patching ${vuln.packageName} (Attempt ${attempt})`);
         
-        await synthesizePatch(vuln, repoPath, failoverPipeline, sessionId, previousStderr);
+        await synthesizePatch(vuln, repoPath, ecosystem, failoverPipeline, sessionId, previousStderr);
         
         eventBus.emitStageChange(sessionId, 'PATCHING', 'TESTING');
-        regressionResult = await runRegression(repoPath, sessionId);
+        regressionResult = await runRegression(repoPath, ecosystem, sessionId);
         
         if (regressionResult.passed) {
           success = true;
