@@ -271,7 +271,13 @@ Object.values(EventTypes).forEach(eventType => {
       } else if (eventType === EventTypes.LOG) {
         record.logs = record.logs || [];
         if (record.logs.length < 200) {
-          record.logs.push(eventData.data);
+          record.logs.push({
+            timestamp: eventData.timestamp,
+            stage: eventData.stage,
+            level: eventData.level,
+            message: eventData.message,
+            data: eventData.data
+          });
         }
       } else if (eventType === EventTypes.COMPLETE) {
         record.status = 'success';
