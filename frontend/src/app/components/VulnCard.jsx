@@ -46,11 +46,15 @@ export default function VulnCard({ vuln }) {
     }
   }, [isOpen]);
 
-  const copyCommand = (e) => {
+  const copyCommand = async (e) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(`npm install ${packageName}@${targetVersion}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(`npm install ${packageName}@${targetVersion}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
   };
 
   return (
