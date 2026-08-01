@@ -1,8 +1,8 @@
-import { SignIn } from "@clerk/nextjs";
+import { SignUp } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import Link from "next/link";
 
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <div className="min-h-screen w-full bg-[#05070c] text-white flex flex-col items-center justify-center relative overflow-hidden font-sans py-12 px-4">
       {/* Background Ambient Glow Orbs */}
@@ -30,20 +30,20 @@ export default function SignInPage() {
       <div className="relative z-10 mb-8 text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 text-[11px] font-mono font-semibold shadow-sm mb-1">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span>AUTH // SECURE ACCESS PROTOCOL</span>
+          <span>REGISTRATION // OPERATOR REGISTRY</span>
         </div>
         <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-cyan-300">
           AEGIS-PATCH
         </h1>
         <p className="text-sm text-slate-400 max-w-sm mx-auto">
-          Autonomous Vulnerability Remediation & Security Operations Center
+          Create an account to manage automated vulnerability pipelines
         </p>
       </div>
 
-      {/* Styled Clerk Sign-In Form Container */}
+      {/* Styled Clerk Sign-Up Form Container */}
       <div className="relative z-10 w-full max-w-md shadow-[0_0_80px_rgba(6,182,212,0.18)] rounded-3xl p-1 bg-gradient-to-b from-cyan-500/30 via-indigo-500/10 to-transparent">
         <div className="bg-[#0b0d14]/90 backdrop-blur-2xl border border-white/10 rounded-[22px] p-2">
-          <SignIn
+          <SignUp
             appearance={{
               baseTheme: dark,
               layout: {
