@@ -114,7 +114,7 @@ export default function useWebSocket() {
 
       ws.onclose = (event) => {
         setConnectionStatus('CLOSED');
-        if (stageRef.current === 'COMPLETE' || event.code === 1000) return;
+        if (stageRef.current === 'COMPLETE' || stageRef.current === 'ERROR' || event.code === 1000 || event.code === 1008) return;
 
         const timeout = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
         reconnectAttemptsRef.current += 1;
