@@ -188,7 +188,7 @@ const server = http.createServer((req, res) => {
         });
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ sessionId, status: 'started' }));
+        res.end(JSON.stringify({ sessionId, status: 'started', message: 'Patch pipeline started' }));
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Invalid JSON body' }));
@@ -197,7 +197,7 @@ const server = http.createServer((req, res) => {
   } else if (req.method === 'GET' && req.url === '/api/history') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(scanHistory.slice(0, 50)));
-  } else if (req.method === 'GET' && req.url === '/health') {
+  } else if (req.method === 'GET' && (req.url === '/health' || req.url === '/api/health')) {
     const uptimeSeconds = Math.floor((Date.now() - SERVER_START_TIME) / 1000);
     const mem = process.memoryUsage();
     res.writeHead(200, { 'Content-Type': 'application/json' });

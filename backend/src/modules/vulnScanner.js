@@ -81,11 +81,13 @@ export async function scanVulnerabilities(repoPath, lockfileData, ecosystem, fai
                 packageName: packageList[i].name,
                 installedVersion: packageList[i].version,
                 patchedVersion,
+                targetVersion: patchedVersion || 'latest',
                 cveId,
                 ghsaId: v.id,
                 severity,
                 cvssScore,
                 title: vulnData.summary || vulnData.details || 'Vulnerability',
+                description: vulnData.details || vulnData.summary || 'No detailed vulnerability description available for this advisory.',
                 fixCommitUrl,
                 vulnData
               };
@@ -251,10 +253,13 @@ export async function scanVulnerabilities(repoPath, lockfileData, ecosystem, fai
               packageName: 'source-code',
               installedVersion: 'N/A',
               patchedVersion: null,
+              targetVersion: 'Patched',
               cveId: v.cveId || 'LLM-SAST',
+              ghsaId: v.cveId || 'LLM-SAST',
               severity: sev,
               cvssScore: cvss,
               title: v.title || 'Vulnerability detected by LLM',
+              description: v.title || 'Security vulnerability detected by AI-powered static analysis.',
               vulnerableFile: v.file, // Passed for patching
               vulnerableSnippet: v.snippet
             };
