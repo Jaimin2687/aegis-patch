@@ -10,6 +10,7 @@ export function GlowInput({
   onSubmit,
   error,
   isLoading,
+  disabled,
   placeholder,
   className,
 }) {
@@ -17,12 +18,12 @@ export function GlowInput({
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && onSubmit) {
-      onSubmit();
+      onSubmit(e);
     }
   };
 
   return (
-    <div className={cn('relative w-full max-w-xl flex flex-col gap-2', className)}>
+    <div className={cn('relative w-full max-w-2xl flex flex-col gap-2', className)}>
       <div
         className={cn(
           'relative flex items-center p-[1px] rounded-xl overflow-hidden transition-all duration-300',
@@ -42,15 +43,15 @@ export function GlowInput({
             onKeyDown={handleKeyDown}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            disabled={disabled}
             placeholder={placeholder || 'Enter repository URL...'}
-            className="flex-1 bg-transparent border-none outline-none py-3 px-2 text-white placeholder-slate-500 font-mono text-sm"
+            className="flex-1 bg-transparent border-none outline-none py-3 px-2 text-white placeholder-slate-500 font-mono text-sm disabled:opacity-50"
           />
           <div className="pr-2 py-2 flex-shrink-0">
             <button
-              type="button"
-              onClick={onSubmit}
-              disabled={isLoading}
-              className="flex items-center justify-center bg-white text-black hover:bg-white/90 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              type="submit"
+              disabled={isLoading || disabled || !value}
+              className="flex items-center justify-center bg-white text-black hover:bg-white/90 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isLoading ? (
                 <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
@@ -75,3 +76,4 @@ export function GlowInput({
     </div>
   );
 }
+

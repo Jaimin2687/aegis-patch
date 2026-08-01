@@ -62,27 +62,15 @@ export default function DashboardPage() {
       </header>
 
       <form onSubmit={handleSubmit} className="w-full max-w-2xl">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <GlowInput
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-              placeholder="https://github.com/username/repository"
-              disabled={submitting || pipelineStarted}
-              className="w-full text-white bg-slate-900/60 backdrop-blur-xl border-white/10"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={submitting || pipelineStarted || !repoUrl}
-            className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] cursor-pointer"
-          >
-            {submitting ? 'Initializing...' : pipelineStarted ? 'Running' : 'Start Pipeline'}
-          </button>
-        </div>
-        {submitError && (
-          <p className="mt-2 text-sm text-red-400 font-medium">{submitError}</p>
-        )}
+        <GlowInput
+          value={repoUrl}
+          onChange={(e) => setRepoUrl(e.target.value)}
+          onSubmit={handleSubmit}
+          placeholder="https://github.com/username/repository"
+          isLoading={submitting}
+          error={submitError}
+          disabled={submitting || pipelineStarted}
+        />
       </form>
 
       <AnimatePresence mode="wait">
