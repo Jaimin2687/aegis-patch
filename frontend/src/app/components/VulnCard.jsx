@@ -22,7 +22,7 @@ export default function VulnCard({ vuln }) {
   const parsedCvss = Number(v.cvssScore);
   const cvss = Number.isFinite(parsedCvss) ? parsedCvss : (severity === 'CRITICAL' ? 9.5 : severity === 'HIGH' ? 8.2 : severity === 'MEDIUM' ? 5.5 : 3.1);
   const patchedVersion = v.patchedVersion;
-  const advisoryUrl = v.fixCommitUrl || (ghsaId ? `https://osv.dev/vulnerability/${ghsaId}` : `https://osv.dev/list?q=${packageName}`);
+  const advisoryUrl = ghsaId ? `https://osv.dev/vulnerability/${ghsaId}` : `https://osv.dev/list?q=${encodeURIComponent(packageName)}`;
 
   const severityConfig = {
     CRITICAL: { variant: 'destructive', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30', gradient: 'from-red-500 to-rose-600', badgeBg: 'bg-red-950/80 text-red-300 border-red-500/40' },
