@@ -61,6 +61,7 @@ export default function useWebSocket() {
 
       ws.onopen = () => {
         setConnectionStatus('OPEN');
+        setError(null); // Clear transient connection errors once connected
         reconnectAttemptsRef.current = 0;
       };
 
@@ -124,7 +125,9 @@ export default function useWebSocket() {
       };
 
       ws.onerror = () => {
-        setError('WebSocket connection error.');
+        if (ws.readyState !== WebSocket.OPEN) {
+          setError('WebSocket connection error.');
+        }
       };
     };
 
