@@ -16,6 +16,10 @@ export default function ScanHistoryPage() {
   const [showLogs, setShowLogs] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    setShowLogs(false);
+  }, [selectedScan?.id]);
+
   const fetchHistory = useCallback(async () => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
