@@ -12,17 +12,15 @@ export default function VulnCard({ vuln }) {
   const v = vuln || {};
   const cveId = v.cveId || v.ghsaId || 'UNKNOWN-CVE';
   const ghsaId = v.ghsaId || v.cveId;
-  const severityRaw = (v.severity || 'MEDIUM').toUpperCase();
-  const severity = severityRaw === 'MODERATE' ? 'MEDIUM' : severityRaw;
+  const severity = (v.severity || 'MEDIUM').toUpperCase();
   const description = v.description || v.vulnData?.details || v.title || 'No detailed vulnerability description available for this advisory.';
   const title = v.title || 'Security Vulnerability';
   const packageName = v.packageName || 'Unknown Package';
   const installedVersion = v.installedVersion || '0.0.0';
   const targetVersion = v.targetVersion || v.patchedVersion || 'Latest Safe';
-  const parsedCvss = Number(v.cvssScore);
-  const cvss = Number.isFinite(parsedCvss) ? parsedCvss : (severity === 'CRITICAL' ? 9.5 : severity === 'HIGH' ? 8.2 : severity === 'MEDIUM' ? 5.5 : 3.1);
+  const cvss = Number(v.cvssScore) || (severity === 'CRITICAL' ? 9.5 : severity === 'HIGH' ? 8.2 : severity === 'MEDIUM' ? 5.5 : 3.1);
   const patchedVersion = v.patchedVersion;
-  const advisoryUrl = ghsaId ? `https://osv.dev/vulnerability/${ghsaId}` : `https://osv.dev/list?q=${encodeURIComponent(packageName)}`;
+  const advisoryUrl = v.fixCommitUrl || (ghsaId ? `https://osv.dev/vulnerability/${ghsaId}` : `https://osv.dev/list?q=${packageName}`);
 
   const severityConfig = {
     CRITICAL: { variant: 'destructive', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30', gradient: 'from-red-500 to-rose-600', badgeBg: 'bg-red-950/80 text-red-300 border-red-500/40' },
@@ -46,15 +44,11 @@ export default function VulnCard({ vuln }) {
     }
   }, [isOpen]);
 
-  const copyCommand = async (e) => {
+  const copyCommand = (e) => {
     e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(`npm install ${packageName}@${targetVersion}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
+    navigator.clipboard.writeText(`npm install ${packageName}@${targetVersion}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -66,11 +60,6 @@ export default function VulnCard({ vuln }) {
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.3, type: 'spring' }}
         className="h-full cursor-pointer group"
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') setIsOpen(true);
-        }}
         onClick={() => setIsOpen(true)}
       >
         <SpotlightCard className="h-full p-5 bg-[#0a0a0a] border border-white/10 group-hover:border-cyan-500/50 group-hover:shadow-lg group-hover:shadow-cyan-500/10 transition-all duration-300 rounded-xl flex flex-col gap-4 relative overflow-hidden">
@@ -130,7 +119,7 @@ export default function VulnCard({ vuln }) {
               <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full bg-gradient-to-r ${severityConfig.gradient} transition-all duration-1000 ease-out`}
-                  style={{ width: `${(Math.min(Math.max(cvss, 0), 10) / 10) * 100}%` }}
+                  style={{ width: `${(cvss / 10) * 100}%` }}
                 />
               </div>
             </div>
@@ -163,8 +152,6 @@ export default function VulnCard({ vuln }) {
 
             {/* Modal Box */}
             <motion.div
-              role="dialog"
-              aria-modal="true"
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
