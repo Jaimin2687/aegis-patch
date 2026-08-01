@@ -67,7 +67,7 @@ export default function Hero() {
                 Launch Dashboard →
               </ShimmerButton>
             </Link>
-            <Link href="https://github.com" target="_blank" rel="noopener noreferrer">
+            <Link href="https://github.com/Jaimin2687/aegis-patch" target="_blank" rel="noopener noreferrer">
               <button className="px-8 py-4 text-base font-semibold rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all backdrop-blur-sm">
                 View on GitHub
               </button>

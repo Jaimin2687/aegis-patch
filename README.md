@@ -41,6 +41,13 @@ You input a GitHub repository URL, and AEGIS-PATCH executes a complete pipeline:
 - Automatically pushes the patched code and **generates a GitHub Pull Request**
 - Streams the entire process in real-time to a stunning, **IDE-like dashboard**
 
+### 🎯 Live Demo
+
+- **Live deployed URL:** [https://aegis-patch-frontend.vercel.app](https://aegis-patch-frontend.vercel.app)
+- **Test vulnerable repository for demonstration:** [https://github.com/Jaimin2687/test-vuln-repo](https://github.com/Jaimin2687/test-vuln-repo)
+
+*Paste the test repository URL into the dashboard and click Start Patching to see AEGIS-PATCH in action.*
+
 ---
 
 ## ✨ Core Feature Set
