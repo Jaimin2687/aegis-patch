@@ -278,8 +278,8 @@ export default function ScanHistoryPage() {
 
                   {selectedScan.vulns && selectedScan.vulns.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {selectedScan.vulns.map((v) => (
-                        <VulnCard key={v.cveId || v.ghsaId || Math.random().toString()} vuln={v} />
+                      {selectedScan.vulns.map((v, idx) => (
+                        <VulnCard key={v.cveId || v.ghsaId || `${v.packageName || 'vuln'}-${v.installedVersion || ''}-${idx}`} vuln={v} />
                       ))}
                     </div>
                   ) : (
