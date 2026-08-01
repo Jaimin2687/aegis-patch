@@ -1,0 +1,22 @@
+{
+  "name": "aegis-patch-backend",
+  "version": "1.0.0",
+  "description": "AEGIS-PATCH Backend Daemon — Autonomous vulnerability patching engine",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "simple-git": "^3.27.0",
+    "@octokit/rest": "^21.1.1",
+    "ws": "^8.18.0",
+    "dotenv": "^16.4.7",
+    "uuid": "^11.1.0",
+    "undici": "^7.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
