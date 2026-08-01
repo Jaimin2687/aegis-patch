@@ -19,7 +19,8 @@ export default function VulnCard({ vuln }) {
   const packageName = v.packageName || 'Unknown Package';
   const installedVersion = v.installedVersion || '0.0.0';
   const targetVersion = v.targetVersion || v.patchedVersion || 'Latest Safe';
-  const cvss = Number(v.cvssScore) || (severity === 'CRITICAL' ? 9.5 : severity === 'HIGH' ? 8.2 : severity === 'MEDIUM' ? 5.5 : 3.1);
+  const parsedCvss = Number(v.cvssScore);
+  const cvss = Number.isFinite(parsedCvss) ? parsedCvss : (severity === 'CRITICAL' ? 9.5 : severity === 'HIGH' ? 8.2 : severity === 'MEDIUM' ? 5.5 : 3.1);
   const patchedVersion = v.patchedVersion;
   const advisoryUrl = v.fixCommitUrl || (ghsaId ? `https://osv.dev/vulnerability/${ghsaId}` : `https://osv.dev/list?q=${packageName}`);
 
