@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   
-  const { sessionId, stage, logs, vulns, result, error: wsError, connectionStatus } = useWebSocket();
+  const { sessionId, stage, logs, vulns, result, error: wsError, connectionStatus, startSession } = useWebSocket();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,13 +29,16 @@ export default function DashboardPage() {
       const res = await fetch(`${apiUrl}/api/patch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ repoUrl, sessionId })
+        body: JSON.stringify({ repoUrl })
       });
       
       if (!res.ok) {
         throw new Error('Failed to start pipeline');
       }
       
+      const data = await res.json();
+      // Connect WebSocket using the backend's session ID
+      startSession(data.sessionId);
       setPipelineStarted(true);
     } catch (err) {
       setSubmitError(err.message || 'An error occurred while connecting to the pipeline.');
