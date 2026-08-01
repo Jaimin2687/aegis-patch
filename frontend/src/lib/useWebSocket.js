@@ -1,108 +1,96 @@
 import { useState, useEffect, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-export function useWebSocket(backendUrl, sessionId) {
-  const [logs, setLogs] = useState([]);
+export default function useWebSocket() {
+  const [sessionId, setSessionId] = useState('');
   const [stage, setStage] = useState('');
+  const [logs, setLogs] = useState([]);
   const [vulns, setVulns] = useState([]);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [connectionStatus, setConnectionStatus] = useState('IDLE');
+  const [connectionStatus, setConnectionStatus] = useState('CLOSED');
   
   const wsRef = useRef(null);
-  const reconnectAttempts = useRef(0);
-  
+  const reconnectTimeoutRef = useRef(null);
+  const reconnectAttemptsRef = useRef(0);
+
   useEffect(() => {
-    if (!backendUrl || !sessionId) {
-      setConnectionStatus('IDLE');
-      return;
-    }
+    // Reset state on new session
+    setLogs([]);
+    setStage('');
+    setVulns([]);
+    setResult(null);
+    setError(null);
     
-    let isMounted = true;
-    let reconnectTimeout = null;
-    
+    const newSessionId = uuidv4();
+    setSessionId(newSessionId);
+
     const connect = () => {
       setConnectionStatus('CONNECTING');
-      const wsUrl = backendUrl.replace(/^http/, 'ws') + `/ws?sessionId=${sessionId}`;
+      
+      let backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      backendUrl = backendUrl.replace(/\/+$/, ''); // Strip trailing slashes
+      const wsUrl = backendUrl.replace(/^http/, 'ws') + `/ws/${newSessionId}`;
       
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
-      
+
       ws.onopen = () => {
-        if (!isMounted) return;
         setConnectionStatus('OPEN');
-        reconnectAttempts.current = 0;
+        reconnectAttemptsRef.current = 0;
       };
-      
+
       ws.onmessage = (event) => {
-        if (!isMounted) return;
         try {
           const data = JSON.parse(event.data);
-          switch (data.type) {
-            case 'LOG':
-              setLogs(prev => {
-                const newLogs = [...prev, data];
-                if (newLogs.length > 1000) return newLogs.slice(newLogs.length - 1000);
-                return newLogs;
-              });
-              break;
-            case 'STAGE_CHANGE':
-              if (data.to) setStage(data.to);
-              break;
-            case 'VULN_FOUND':
-              if (data.data) {
-                setVulns(prev => [...prev, data.data]);
-              }
-              break;
-            case 'COMPLETE':
-              if (data.data) {
-                setResult(data.data);
-              }
-              break;
-            case 'ERROR':
-              if (data.message) {
-                setError(data.message);
-              }
-              break;
-            default:
-              break;
+          
+          if (data.type === 'LOG') {
+            setLogs(prev => [...prev, data.data].slice(-1000));
+            if (data.data.stage && data.data.stage !== stage) {
+              setStage(data.data.stage);
+            }
+          } else if (data.type === 'VULN_FOUND') {
+            setVulns(prev => {
+              if (prev.some(v => v.cveId === data.data.cveId)) return prev;
+              return [...prev, data.data];
+            });
+          } else if (data.type === 'RESULT') {
+            setResult(data.data);
+          } else if (data.type === 'ERROR') {
+            setError(data.data.message);
           }
         } catch (e) {
-          console.error('WebSocket message parsing error:', e);
+          console.error('Failed to parse WebSocket message', e);
         }
       };
-      
-      ws.onclose = () => {
-        if (!isMounted) return;
+
+      ws.onclose = (event) => {
         setConnectionStatus('CLOSED');
+        // Do not reconnect if completed or clean close
+        if (stage === 'COMPLETE' || event.code === 1000) return;
         
-        const timeouts = [1000, 2000, 4000, 8000];
-        const timeout = reconnectAttempts.current < timeouts.length 
-          ? timeouts[reconnectAttempts.current] 
-          : 30000;
-          
-        reconnectAttempts.current += 1;
+        const timeout = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
+        reconnectAttemptsRef.current += 1;
         
-        reconnectTimeout = setTimeout(() => {
-          if (isMounted) connect();
+        reconnectTimeoutRef.current = setTimeout(() => {
+          connect();
         }, timeout);
       };
-      
+
       ws.onerror = () => {
-        if (!isMounted) return;
-        setConnectionStatus('ERROR');
+        setError('WebSocket connection error.');
       };
     };
-    
+
     connect();
-    
+
     return () => {
-      isMounted = false;
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       if (wsRef.current) {
-        wsRef.current.close();
+        wsRef.current.close(1000); // Clean close on unmount
       }
     };
-  }, [backendUrl, sessionId]);
-  
-  return { logs, stage, vulns, result, error, connectionStatus };
+  }, []); // Only run once on mount
+
+  return { sessionId, stage, logs, vulns, result, error, connectionStatus };
 }

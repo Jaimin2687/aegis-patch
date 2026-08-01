@@ -1,57 +1,82 @@
 'use client';
-import { getSeverityColor } from '../../lib/formatLog';
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export default function VulnCard({ vuln }) {
-  const severityClass = getSeverityColor(vuln.severity || 'moderate');
-  const cvss = vuln.cvssScore || 0;
-  
+  const v = vuln || {};
+  const cveId = v.cveId || 'UNKNOWN-CVE';
+  const severity = v.severity || 'UNKNOWN';
+  const description = v.description || 'No description available.';
+  const packageName = v.packageName || 'Unknown Package';
+  const installedVersion = v.installedVersion || '0.0.0';
+  const targetVersion = v.targetVersion || '0.0.0';
+  const cvss = Number(v.cvssScore) || 0;
+  const patchedVersion = v.patchedVersion;
+
+  const severityVariant = {
+    CRITICAL: 'destructive',
+    HIGH: 'destructive',
+    MEDIUM: 'warning',
+    LOW: 'info'
+  }[severity.toUpperCase()] || 'default';
+
   return (
-    <div className="bg-gradient-to-b from-[#0a0a0a] to-[#050505] border border-[#222] hover:border-[#444] transition-colors rounded-xl p-5 flex flex-col gap-4">
-      <div className="flex justify-between items-start">
-        <div>
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium border ${severityClass} inline-block mb-2 capitalize`}>
-            {vuln.severity || 'Moderate'}
-          </span>
-          <h3 className="font-bold text-white text-lg">{vuln.cveId || 'Unknown CVE'}</h3>
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3, type: 'spring' }}
+      className="h-full"
+    >
+      <SpotlightCard className="h-full p-5 bg-[#0a0a0a] border border-white/10 rounded-xl flex flex-col gap-4">
+        <div className="flex justify-between items-start gap-2">
+          <h4 className="font-bold text-lg text-white tracking-tight">{cveId}</h4>
+          <div className="flex gap-2 flex-wrap justify-end">
+            <Badge variant={severityVariant} className="text-xs">
+              {severity}
+            </Badge>
+            {patchedVersion && (
+              <Badge variant="success" className="text-xs border-emerald-500/30 bg-emerald-500/15 text-emerald-400">
+                Patched
+              </Badge>
+            )}
+          </div>
         </div>
-        {vuln.patchedVersion && (
-          <span className="bg-[#111] text-emerald-400 text-xs px-2 py-1 rounded-md border border-[#222] font-mono">
-            Patched
-          </span>
-        )}
-      </div>
-      
-      <p className="text-[#888] text-sm leading-relaxed line-clamp-2">
-        {vuln.title || 'Vulnerability detected during scanning phase.'}
-      </p>
-      
-      <div className="bg-[#111] border border-[#222] rounded-lg p-3 space-y-2 mt-auto">
-        <div className="flex justify-between text-sm">
-          <span className="text-[#666]">Package</span>
-          <span className="text-white font-mono">{vuln.packageName || 'unknown'}</span>
+
+        <p className="text-sm text-slate-400 line-clamp-2" title={description}>
+          {description}
+        </p>
+
+        <div className="mt-auto pt-2 space-y-4">
+          <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5">
+            <div className="text-xs font-mono text-slate-400 mb-1">{packageName}</div>
+            <div className="flex items-center gap-2 text-sm font-mono">
+              <span className="text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">{installedVersion}</span>
+              <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+              <span className="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">{targetVersion}</span>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs font-medium">
+              <span className="text-slate-500">CVSS Score</span>
+              <span className="text-slate-300">{cvss.toFixed(1)} / 10</span>
+            </div>
+            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 transition-all duration-1000 ease-out"
+                style={{ width: `${(cvss / 10) * 100}%` }}
+              />
+            </div>
+          </div>
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-[#666]">Installed</span>
-          <span className="text-red-400 font-mono">{vuln.installedVersion || 'unknown'}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-[#666]">Target</span>
-          <span className="text-emerald-400 font-mono">{vuln.patchedVersion || 'unknown'}</span>
-        </div>
-      </div>
-      
-      <div className="space-y-1">
-        <div className="flex justify-between text-xs">
-          <span className="text-[#666]">CVSS Score</span>
-          <span className="text-white">{cvss.toFixed(1)} / 10.0</span>
-        </div>
-        <div className="w-full bg-[#222] h-1.5 rounded-full overflow-hidden">
-          <div 
-            className={`h-full ${cvss >= 9 ? 'bg-red-500' : cvss >= 7 ? 'bg-orange-500' : cvss >= 4 ? 'bg-yellow-500' : 'bg-green-500'}`} 
-            style={{ width: `${(cvss / 10) * 100}%` }}
-          />
-        </div>
-      </div>
-    </div>
+      </SpotlightCard>
+    </motion.div>
   );
 }
