@@ -22,19 +22,19 @@ export default function DashboardLayout({ children }) {
   ];
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-[#050505] border-r border-white/10 text-white transition-all duration-300">
-      <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
+    <div className="flex flex-col h-full bg-white border-r border-gray-200 text-gray-900 transition-all duration-300">
+      <div className="flex items-center justify-between p-4 h-16 border-b border-gray-200">
         {!collapsed && (
-          <span className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-500 truncate">
+          <span className="font-bold text-lg text-gray-900 truncate">
             AEGIS-PATCH
           </span>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden md:flex items-center justify-center p-2 rounded-md hover:bg-slate-800 transition-colors"
+          className="hidden md:flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
           aria-label="Toggle Sidebar"
         >
-          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -51,8 +51,8 @@ export default function DashboardLayout({ children }) {
               className={cn(
                 "w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 text-left cursor-pointer",
                 isActive 
-                  ? "bg-indigo-500/10 text-indigo-400 border-l-2 border-indigo-500" 
-                  : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border-l-2 border-transparent"
+                  ? "bg-gray-100 text-gray-900 font-semibold" 
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
               )}
             >
               <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -66,28 +66,28 @@ export default function DashboardLayout({ children }) {
 
       {!collapsed && (
         <div className="px-4 py-4 mb-2">
-          <div className="bg-slate-900/60 backdrop-blur-xl border border-white/10 p-3 rounded-xl flex items-center space-x-3">
+          <div className="bg-gray-50 border border-gray-200 p-3 rounded-xl flex items-center space-x-3 shadow-sm">
             <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-medium text-slate-300">Pipeline Ready</span>
+            <span className="text-xs font-semibold text-gray-700">Pipeline Ready</span>
           </div>
         </div>
       )}
 
-      <div className="p-4 border-t border-white/10 flex items-center justify-between">
+      <div className="p-4 border-t border-gray-200 flex items-center justify-between">
         <div className={cn("flex items-center", collapsed ? "mx-auto" : "space-x-3")}>
           <UserButton afterSignOutUrl="/" appearance={{ elements: { userButtonAvatarBox: 'w-8 h-8 rounded-lg' } }} />
           {!collapsed && (
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-medium text-slate-200 truncate">{userName}</span>
-              <span className="text-xs text-slate-500">Operator</span>
+              <span className="text-sm font-bold text-gray-900 truncate">{userName}</span>
+              <span className="text-xs font-medium text-gray-500">Operator</span>
             </div>
           )}
         </div>
         {!collapsed && (
-          <span className="text-[10px] font-mono text-slate-600 bg-slate-900 px-2 py-1 rounded-md border border-white/5">
+          <span className="text-[10px] font-mono font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md border border-gray-200">
             v1.0.0
           </span>
         )}
@@ -96,32 +96,29 @@ export default function DashboardLayout({ children }) {
   );
 
   return (
-    <div className="flex h-screen w-full bg-[#000000] overflow-hidden text-slate-200 font-sans">
-      {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#050505] border-b border-white/10 z-50 flex items-center justify-between px-4">
-        <span className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-500">
+    <div className="flex h-screen w-full bg-gray-50 overflow-hidden text-gray-900 font-sans">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-50 flex items-center justify-between px-4">
+        <span className="font-bold text-lg text-gray-900">
           AEGIS-PATCH
         </span>
         <button onClick={() => setMobileOpen(true)} className="p-2">
-          <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+          <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       </div>
 
-      {/* Desktop sidebar */}
       <div className={cn("hidden md:block h-full transition-all duration-300", collapsed ? "w-20" : "w-64")}>
         <SidebarContent />
       </div>
 
-      {/* Mobile sidebar overlay */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 md:hidden bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 md:hidden bg-gray-900/40 backdrop-blur-sm"
           >
             <motion.div
               initial={{ x: '-100%' }}
@@ -133,7 +130,7 @@ export default function DashboardLayout({ children }) {
               <SidebarContent />
               <button 
                 onClick={() => setMobileOpen(false)}
-                className="absolute top-4 -right-12 p-2 bg-slate-800 rounded-full text-white cursor-pointer"
+                className="absolute top-4 -right-12 p-2 bg-white border border-gray-200 rounded-full text-gray-900 cursor-pointer shadow-sm"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -144,7 +141,6 @@ export default function DashboardLayout({ children }) {
         )}
       </AnimatePresence>
 
-      {/* Main content */}
       <main className="flex-1 h-full overflow-y-auto pt-16 md:pt-0">
         <div className="max-w-7xl mx-auto p-4 md:p-8 h-full">
           {children}

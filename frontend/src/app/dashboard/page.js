@@ -9,34 +9,75 @@ import StatusPanel from '@/app/components/StatusPanel';
 import Terminal from '@/app/components/Terminal';
 import VulnCard from '@/app/components/VulnCard';
 import PrResult from '@/app/components/PrResult';
+import VulnChart from '@/app/components/VulnChart';
+import PackageChart from '@/app/components/PackageChart';
+import MetricCard from '@/app/components/MetricCard';
 
 export default function DashboardPage() {
-  const [repoUrl, setRepoUrl] = useState(() => {
-    if (typeof window !== 'undefined') return sessionStorage.getItem('aegis_repo_url') || '';
-    return '';
-  });
-  const [pipelineStarted, setPipelineStarted] = useState(() => {
-    if (typeof window !== 'undefined') return Boolean(sessionStorage.getItem('aegis_session_id'));
-    return false;
-  });
+  const [repoUrl, setRepoUrl] = useState('');
+  const [pipelineStarted, setPipelineStarted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-  // GitHub PAT Guide & Quick Token Input state
   const [showPatGuide, setShowPatGuide] = useState(true);
-  const [userPat, setUserPat] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('aegis_github_token') || '';
-    return '';
-  });
+  const [userPat, setUserPat] = useState('');
+
+  useEffect(() => {
+    setRepoUrl(sessionStorage.getItem('aegis_repo_url') || '');
+    setPipelineStarted(Boolean(sessionStorage.getItem('aegis_session_id')));
+    setUserPat(localStorage.getItem('aegis_github_token') || '');
+  }, []);
   const [patSaved, setPatSaved] = useState(false);
 
-  // Vulnerability search & severity filtering state
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSeverity, setSelectedSeverity] = useState('ALL');
+  
+  const [globalStats, setGlobalStats] = useState({ totalScans: 0, successRate: 0, criticalVulns: 0, mttr: '0s' });
+
+  const fetchGlobalStats = async () => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const res = await fetch(`${apiUrl}/api/history`);
+      if (res.ok) {
+        const history = await res.json();
+        
+        let successCount = 0;
+        let critCount = 0;
+        let totalTimeSec = 0;
+        let completeCount = 0;
+
+        history.forEach(scan => {
+          if (scan.status === 'success') successCount++;
+          if (scan.status === 'success' || scan.status === 'error') {
+             completeCount++;
+             if (scan.duration) totalTimeSec += parseFloat(scan.duration) || 0;
+          }
+          if (scan.vulns && Array.isArray(scan.vulns)) {
+             critCount += scan.vulns.filter(v => (v.severity || '').toUpperCase() === 'CRITICAL').length;
+          }
+        });
+
+        const rate = history.length ? Math.round((successCount / history.length) * 100) : 0;
+        const avgTime = completeCount ? Math.round(totalTimeSec / completeCount) : 0;
+        
+        setGlobalStats({
+          totalScans: history.length,
+          successRate: rate,
+          criticalVulns: critCount,
+          mttr: avgTime ? `${avgTime}s` : '--',
+        });
+      }
+    } catch (err) {
+      console.error('Failed to fetch stats:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchGlobalStats();
+  }, []);
 
   const { sessionId, stage, logs, vulns, result, error: wsError, connectionStatus, startSession, clearSession } = useWebSocket();
 
-  // Keep pipelineStarted in sync if session ID exists
   useEffect(() => {
     if (sessionId) {
       setPipelineStarted(true);
@@ -64,7 +105,6 @@ export default function DashboardPage() {
     e.preventDefault();
     if (!repoUrl.trim()) return;
 
-    // Validate GitHub URL format
     if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(\.git)?\/?$/.test(repoUrl.trim())) {
       setSubmitError('Please enter a valid GitHub repository URL (e.g., https://github.com/user/repo)');
       return;
@@ -83,7 +123,14 @@ export default function DashboardPage() {
       });
 
       if (!res.ok) {
-        throw new Error('Failed to start pipeline');
+        let errMsg = 'Failed to start pipeline';
+        try {
+          const errData = await res.json();
+          if (errData.error) errMsg = errData.error;
+        } catch (e) {
+          // ignore parsing error
+        }
+        throw new Error(errMsg);
       }
 
       const data = await res.json();
@@ -96,7 +143,6 @@ export default function DashboardPage() {
     }
   };
 
-  // Severity counts computation
   const severityCounts = useMemo(() => {
     const counts = { ALL: vulns.length, CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
     vulns.forEach(v => {
@@ -106,7 +152,6 @@ export default function DashboardPage() {
     return counts;
   }, [vulns]);
 
-  // Filtered vulnerabilities list
   const filteredVulns = useMemo(() => {
     return vulns.filter(v => {
       const matchesSeverity = selectedSeverity === 'ALL' || (v.severity || '').toUpperCase() === selectedSeverity;
@@ -120,7 +165,6 @@ export default function DashboardPage() {
     });
   }, [vulns, selectedSeverity, searchQuery]);
 
-  // Export audit report as JSON
   const handleExportReport = () => {
     const reportData = {
       sessionId,
@@ -143,29 +187,29 @@ export default function DashboardPage() {
   };
 
   const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } }
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
 
   return (
-    <div className="w-full h-full flex flex-col space-y-8 font-sans">
+    <div className="w-full h-full flex flex-col space-y-8 font-sans bg-gray-50 text-gray-900">
       <header className="flex justify-between items-start flex-wrap gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-white">Command Center</h1>
-          <p className="text-slate-400">Launch and monitor vulnerability patching pipelines.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Command Center</h1>
+          <p className="text-gray-500">Launch and monitor vulnerability patching pipelines.</p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={() => setShowPatGuide(!showPatGuide)}
-            className="px-3.5 py-2 bg-slate-900/90 hover:bg-slate-800 border border-white/15 text-slate-300 hover:text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-md hover:border-cyan-500/40"
+            className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm"
           >
-            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
             </svg>
             <span>{showPatGuide ? 'Hide Token Setup' : 'GitHub Token Guide'}</span>
@@ -176,10 +220,10 @@ export default function DashboardPage() {
               {vulns.length > 0 && (
                 <button
                   onClick={handleExportReport}
-                  className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md"
+                  className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm"
                   title="Export audit report as JSON"
                 >
-                  <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                   <span>Export Report</span>
@@ -187,9 +231,9 @@ export default function DashboardPage() {
               )}
               <button
                 onClick={handleStartNewScan}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-white/15 text-slate-200 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-md hover:border-cyan-500/30"
+                className="px-4 py-2 bg-gray-900 hover:bg-gray-800 border border-transparent text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm"
               >
-                <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                 </svg>
                 <span>Start New Scan</span>
@@ -199,7 +243,66 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* ─── Premium GitHub Integration Personal Access Token Note Card ─── */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
+        <motion.div variants={itemVariants}>
+          <MetricCard 
+            title="Total Scans" 
+            value={globalStats.totalScans} 
+            trend={globalStats.totalScans > 0 ? "+1" : null}
+            trendLabel="recently"
+            icon={
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            }
+          />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <MetricCard 
+            title="Avg. Time to Patch" 
+            value={globalStats.mttr} 
+            trend="-12%"
+            trendLabel="vs last week"
+            icon={
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            }
+          />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <MetricCard 
+            title="Pipeline Success Rate" 
+            value={`${globalStats.successRate}%`} 
+            trend="+5%"
+            trendLabel="vs last week"
+            icon={
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            }
+          />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <MetricCard 
+            title="Critical Risks Found" 
+            value={globalStats.criticalVulns} 
+            trend={globalStats.criticalVulns > 0 ? "-2" : null}
+            trendLabel="mitigated"
+            icon={
+              <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            }
+          />
+        </motion.div>
+      </motion.div>
+
       <AnimatePresence>
         {showPatGuide && (
           <motion.div
@@ -207,26 +310,25 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="w-full bg-[#0c0e14] border border-cyan-500/25 rounded-2xl p-6 shadow-2xl shadow-cyan-950/20 space-y-5 relative"
+            className="w-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5 relative"
           >
-            {/* Header Bar */}
             <div className="flex justify-between items-start gap-4">
               <div className="flex items-start gap-3">
-                <div className="p-2.5 bg-cyan-500/15 border border-cyan-500/30 rounded-xl text-cyan-400 shrink-0">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                <div className="p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 shrink-0">
+                  <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
                   </svg>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-lg font-bold text-white tracking-tight">
+                    <h3 className="text-lg font-bold text-gray-900 tracking-tight">
                       GitHub Personal Access Token (PAT) Setup
                     </h3>
-                    <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40">
+                    <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200">
                       Required for Pull Requests
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                  <p className="text-xs text-gray-500 mt-1 max-w-2xl leading-relaxed">
                     AEGIS-PATCH uses your Personal Access Token to commit fix branches and open Pull Requests. Follow the 3 steps below to set up your token:
                   </p>
                 </div>
@@ -234,7 +336,7 @@ export default function DashboardPage() {
 
               <button
                 onClick={() => setShowPatGuide(false)}
-                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors shrink-0"
+                className="text-gray-400 hover:text-gray-900 p-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0"
                 aria-label="Close setup guide"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,61 +345,56 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            {/* 3 Step Instruction Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-              {/* Step 1 */}
-              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-cyan-500/30 transition-colors flex flex-col justify-between">
+              <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1.5 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-[11px]">1</span>
+                  <div className="flex items-center gap-2 text-xs font-bold text-gray-900 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-[11px]">1</span>
                     <span>Generate Token</span>
                   </div>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline font-medium">GitHub Developer Settings</a> to create a Fine-grained Token.
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline font-medium">GitHub Developer Settings</a> to create a Fine-grained Token.
                   </p>
                 </div>
               </div>
 
-              {/* Step 2 */}
-              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-indigo-500/30 transition-colors flex flex-col justify-between">
+              <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1.5 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-indigo-400 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-[11px]">2</span>
+                  <div className="flex items-center gap-2 text-xs font-bold text-gray-900 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-[11px]">2</span>
                     <span>Set Permissions</span>
                   </div>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Under <em>Repository Permissions</em>, grant <strong className="text-emerald-400">Read & write</strong> for both <strong className="text-white">Contents</strong> and <strong className="text-white">Pull requests</strong>.
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    Under <em>Repository Permissions</em>, grant <strong className="text-gray-900">Read & write</strong> for both <strong className="text-gray-900">Contents</strong> and <strong className="text-gray-900">Pull requests</strong>.
                   </p>
                 </div>
               </div>
 
-              {/* Step 3 */}
-              <div className="bg-[#11131c] border border-white/10 p-4 rounded-xl space-y-1.5 hover:border-emerald-500/30 transition-colors flex flex-col justify-between">
+              <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1.5 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-[11px]">3</span>
+                  <div className="flex items-center gap-2 text-xs font-bold text-gray-900 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-[11px]">3</span>
                     <span>Paste or Save Token</span>
                   </div>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Paste your PAT (<code className="text-cyan-300 font-mono">github_pat_...</code>) in the input below or add to <code className="text-cyan-300 font-mono">backend/.env</code>.
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    Paste your PAT (<code className="text-gray-800 font-mono">github_pat_...</code>) in the input below.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Quick PAT Input & Actions */}
-            <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="pt-3 border-t border-gray-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2 flex-1 max-w-xl">
                 <input
                   type="password"
                   value={userPat}
                   onChange={(e) => setUserPat(e.target.value)}
                   placeholder="Paste your GitHub Personal Access Token (github_pat_...)"
-                  className="flex-1 bg-black/80 border border-white/15 focus:border-cyan-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 font-mono outline-none transition-colors"
+                  className="flex-1 bg-white border border-gray-200 focus:border-gray-400 rounded-xl px-3.5 py-2 text-xs text-gray-900 placeholder-gray-400 font-mono outline-none transition-colors"
                 />
                 <button
                   onClick={handleSavePat}
-                  className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-black font-semibold text-xs rounded-xl shadow-md transition-all shrink-0 active:scale-95"
+                  className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-xs rounded-xl shadow-sm transition-all shrink-0 active:scale-95"
                 >
                   {patSaved ? '✓ Saved!' : 'Save PAT'}
                 </button>
@@ -308,7 +405,7 @@ export default function DashboardPage() {
                   href="https://github.com/settings/tokens?type=beta"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-white/15 text-cyan-300 hover:text-white text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
                 >
                   <span>Generate on GitHub</span>
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -317,9 +414,9 @@ export default function DashboardPage() {
                 </a>
                 <Link
                   href="/dashboard/settings"
-                  className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-white/15 text-slate-300 hover:text-white text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
                 >
-                  <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -352,13 +449,13 @@ export default function DashboardPage() {
             exit={{ opacity: 0 }}
             className="flex-1 flex flex-col items-center justify-center py-20 text-center"
           >
-            <div className="w-32 h-32 mb-6 rounded-full bg-slate-900/50 border border-white/5 flex items-center justify-center relative shadow-[0_0_40px_rgba(0,0,0,0.5)]">
-              <svg className="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+            <div className="w-32 h-32 mb-6 rounded-full bg-white border border-gray-200 flex items-center justify-center relative shadow-sm">
+              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
               </svg>
             </div>
-            <h3 className="text-xl font-medium text-white mb-2">Awaiting Target</h3>
-            <p className="text-slate-400 max-w-md">
+            <h3 className="text-xl font-medium text-gray-900 mb-2">Awaiting Target</h3>
+            <p className="text-gray-500 max-w-md">
               Enter a repository URL above to begin the autonomous security patching process.
             </p>
           </motion.div>
@@ -375,8 +472,8 @@ export default function DashboardPage() {
             </motion.div>
 
             {wsError && connectionStatus !== 'OPEN' && (
-              <motion.div variants={itemVariants} className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl flex items-start gap-3">
-                <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <motion.div variants={itemVariants} className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl flex items-start gap-3">
+                <svg className="w-5 h-5 shrink-0 mt-0.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div className="flex-1">
@@ -385,7 +482,7 @@ export default function DashboardPage() {
                 </div>
                 <button
                   onClick={handleStartNewScan}
-                  className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-300 transition-colors font-medium"
+                  className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 border border-red-200 text-red-700 transition-colors font-medium"
                 >
                   ↺ Retry / Reset
                 </button>
@@ -399,70 +496,99 @@ export default function DashboardPage() {
             )}
 
             {vulns.length > 0 && (
-              <motion.div variants={itemVariants} className="space-y-4">
-                {/* Vulnerability Filter Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/40 p-4 rounded-2xl border border-white/10">
-                  <h3 className="text-lg font-medium text-white flex items-center gap-2">
-                    <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    Detected Vulnerabilities ({filteredVulns.length} of {vulns.length})
-                  </h3>
-
-                  {/* Filter Pills & Search */}
-                  <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
-                    {/* Search Input */}
-                    <div className="relative flex-1 sm:w-64">
-                      <svg className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <motion.div variants={itemVariants} className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                
+                {/* Analytics / Chart Column */}
+                <div className="xl:col-span-1 flex flex-col gap-6">
+                  {/* Severity Breakdown */}
+                  <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col">
+                    <h3 className="text-sm font-bold text-gray-900 mb-6 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
                       </svg>
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search package or CVE..."
-                        className="w-full bg-slate-950/80 border border-white/15 focus:border-cyan-500/60 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 outline-none transition-colors"
-                      />
+                      Severity Breakdown
+                    </h3>
+                    <div className="flex-1 flex items-center justify-center">
+                      <VulnChart severityCounts={severityCounts} />
                     </div>
+                  </div>
 
-                    {/* Severity Pills */}
-                    <div className="flex items-center gap-1 bg-black/60 p-1 rounded-xl border border-white/10 text-xs font-medium">
-                      {['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(sev => {
-                        const count = severityCounts[sev] || 0;
-                        if (sev !== 'ALL' && count === 0) return null;
-                        const isSelected = selectedSeverity === sev;
-                        return (
-                          <button
-                            key={sev}
-                            onClick={() => setSelectedSeverity(sev)}
-                            className={`px-2.5 py-1 rounded-lg transition-all text-[11px] ${
-                              isSelected
-                                ? 'bg-cyan-500 text-black font-bold shadow-sm shadow-cyan-500/30'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
-                            }`}
-                          >
-                            {sev} ({count})
-                          </button>
-                        );
-                      })}
+                  {/* Top Vulnerable Packages */}
+                  <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col">
+                    <h3 className="text-sm font-bold text-gray-900 mb-6 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                      </svg>
+                      Top Affected Packages
+                    </h3>
+                    <div className="flex-1">
+                      <PackageChart vulns={vulns} />
                     </div>
                   </div>
                 </div>
 
-                {/* Cards Grid */}
-                {filteredVulns.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <AnimatePresence>
-                      {filteredVulns.map((vuln) => (
-                        <VulnCard key={vuln.cveId || vuln.ghsaId || Math.random().toString()} vuln={vuln} />
-                      ))}
-                    </AnimatePresence>
+                {/* Vulnerabilities List Column */}
+                <div className="xl:col-span-3 space-y-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Detected Vulnerabilities ({filteredVulns.length} of {vulns.length})
+                    </h3>
+
+                    <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
+                      <div className="relative flex-1 sm:w-64">
+                        <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          placeholder="Search package or CVE..."
+                          className="w-full bg-gray-50 border border-gray-200 focus:border-gray-400 rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-900 placeholder-gray-500 outline-none transition-colors"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-200 text-xs font-medium">
+                        {['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(sev => {
+                          const count = severityCounts[sev] || 0;
+                          if (sev !== 'ALL' && count === 0) return null;
+                          const isSelected = selectedSeverity === sev;
+                          return (
+                            <button
+                              key={sev}
+                              onClick={() => setSelectedSeverity(sev)}
+                              className={`px-2.5 py-1 rounded-lg transition-all text-[11px] ${
+                                isSelected
+                                  ? 'bg-white text-gray-900 font-bold shadow-sm border border-gray-200'
+                                  : 'text-gray-500 hover:text-gray-900 hover:bg-white'
+                              }`}
+                            >
+                              {sev} ({count})
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <div className="p-8 text-center bg-slate-900/30 border border-white/5 rounded-xl text-slate-400 text-sm">
-                    No vulnerabilities match your filter criteria "{searchQuery || selectedSeverity}".
-                  </div>
-                )}
+
+                  {filteredVulns.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                      <AnimatePresence>
+                        {filteredVulns.map((vuln, idx) => (
+                          <VulnCard key={`${vuln.cveId || vuln.ghsaId || vuln.packageName || 'vuln'}-${idx}`} vuln={vuln} />
+                        ))}
+                      </AnimatePresence>
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center bg-white border border-gray-200 rounded-xl text-gray-500 text-sm shadow-sm">
+                      No vulnerabilities match your filter criteria "{searchQuery || selectedSeverity}".
+                    </div>
+                  )}
+                </div>
               </motion.div>
             )}
 

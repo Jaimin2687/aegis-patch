@@ -37,7 +37,7 @@ const cardVariants = {
 
 export default function Features() {
   return (
-    <section id="features" className="py-24 bg-black relative border-t border-white/5">
+    <section id="features" className="py-24 bg-gray-50 relative border-t border-gray-200">
       <div className="container mx-auto px-4 md:px-6">
         <SectionHeading 
           eyebrow="Capabilities" 
@@ -54,12 +54,12 @@ export default function Features() {
         >
           {features.map((feature, idx) => (
             <motion.div key={idx} variants={cardVariants}>
-              <SpotlightCard className="h-full bg-slate-900/40 border border-white/10 p-6 rounded-2xl flex flex-col">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 flex items-center justify-center text-2xl mb-4 border border-white/5">
+              <SpotlightCard className="h-full bg-white border border-gray-200 p-6 rounded-2xl flex flex-col shadow-sm">
+                <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-700 mb-4 border border-gray-200">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{feature.desc}</p>
               </SpotlightCard>
             </motion.div>
           ))}

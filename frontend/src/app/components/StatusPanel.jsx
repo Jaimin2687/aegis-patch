@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -14,54 +14,80 @@ const STAGES = [
 ];
 
 export default function StatusPanel({ currentStage, isError = false }) {
-  // Gracefully handle unknown stages by clamping to -1
-  const stageIndex = currentStage ? STAGES.findIndex(s => s.id === currentStage) : -1;
-  const isComplete = currentStage === 'COMPLETE';
+  const [stageIndex, setStageIndex] = useState(-1);
+  const rawStageIndex = currentStage ? STAGES.findIndex(s => s.id === currentStage) : -1;
+
+  // Persist the highest achieved stage index so it never flickers backwards or resets to 0 during a run.
+  useEffect(() => {
+    if (rawStageIndex === 0) {
+      // If the backend explicitly restarted to Cloning, reset our tracker.
+      setStageIndex(0);
+    } else if (rawStageIndex > stageIndex) {
+      // Only advance the UI if we've reached a new highest stage.
+      // This prevents flickers if the backend momentarily sends an unknown/null stage (-1)
+      // or loops backwards rapidly.
+      setStageIndex(rawStageIndex);
+    }
+  }, [rawStageIndex, stageIndex]);
+
+  const isComplete = stageIndex === STAGES.length - 1 || currentStage === 'COMPLETE';
+  
+  // Calculate percentage of progress for the connecting line
+  const progressPercent = Math.max(0, Math.min(100, (stageIndex / (STAGES.length - 1)) * 100));
 
   return (
-    <div className="w-full bg-slate-900/60 backdrop-blur-xl border border-white/10 p-6 md:p-8 rounded-2xl">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center relative">
-        {/* Desktop connection lines */}
-        <div className="hidden md:block absolute top-5 left-[20px] right-[20px] h-[2px] bg-slate-800 -z-10" />
-        {/* Mobile connection lines */}
-        <div className="block md:hidden absolute top-[20px] bottom-[20px] left-5 w-[2px] bg-slate-800 -z-10" />
+    <div className="w-full bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center relative z-0">
+        
+        {/* Horizontal background track (Desktop) */}
+        <div className="hidden md:block absolute top-5 left-5 right-5 h-[2px] bg-gray-100 -z-10">
+          <div 
+            className="h-full bg-blue-500 transition-all duration-700 ease-in-out" 
+            style={{ width: `${progressPercent}%` }} 
+          />
+        </div>
+
+        {/* Vertical background track (Mobile) */}
+        <div className="block md:hidden absolute top-5 bottom-[44px] left-5 w-[2px] bg-gray-100 -z-10">
+           <div 
+            className="w-full bg-blue-500 transition-all duration-700 ease-in-out" 
+            style={{ height: `${progressPercent}%` }} 
+          />
+        </div>
 
         {STAGES.map((stage, idx) => {
           const isCompleted = isComplete || (stageIndex !== -1 && idx < stageIndex);
           const isActive = idx === stageIndex;
           const isErrorNode = isActive && isError;
-          const isFuture = stageIndex !== -1 && idx > stageIndex;
 
           return (
             <div key={stage.id} className="flex md:flex-col items-center gap-4 md:gap-3 mb-6 md:mb-0 relative z-10 w-full md:w-auto">
               <motion.div
                 initial={false}
                 animate={{
-                  backgroundColor: isCompleted ? '#34d399' : isActive ? (isErrorNode ? '#f87171' : '#0a0a0a') : '#0a0a0a',
-                  borderColor: isCompleted ? '#34d399' : isActive ? (isErrorNode ? '#f87171' : '#06b6d4') : '#334155',
+                  backgroundColor: isCompleted ? '#10b981' : isActive ? (isErrorNode ? '#ef4444' : '#f3f4f6') : '#ffffff',
+                  borderColor: isCompleted ? '#10b981' : isActive ? (isErrorNode ? '#ef4444' : '#2563eb') : '#e5e7eb',
                   scale: isActive ? 1.1 : 1
                 }}
                 className={cn(
-                  "w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 relative transition-colors duration-300",
-                  isActive && !isErrorNode && "shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+                  "w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 relative transition-colors duration-300"
                 )}
               >
-                {/* Active pulse ring */}
                 {isActive && !isErrorNode && (
-                  <span className="absolute -inset-2 rounded-full border border-cyan-400/50 animate-ping opacity-75"></span>
+                  <span className="absolute -inset-2 rounded-full border border-blue-200 animate-ping opacity-75"></span>
                 )}
                 
                 {isCompleted ? (
                   <motion.svg
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="w-5 h-5 text-slate-900"
+                    className="w-5 h-5 text-white"
                     fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </motion.svg>
                 ) : (
-                  <svg className={cn("w-5 h-5", isActive ? (isErrorNode ? "text-white" : "text-cyan-400") : "text-slate-500")} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <svg className={cn("w-5 h-5", isActive ? (isErrorNode ? "text-white" : "text-blue-600") : "text-gray-400")} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                     {stage.icon}
                   </svg>
                 )}
@@ -70,37 +96,11 @@ export default function StatusPanel({ currentStage, isError = false }) {
               <div className="flex flex-col md:items-center">
                 <span className={cn(
                   "text-sm font-medium transition-colors duration-300",
-                  isCompleted ? "text-slate-300" : isActive ? (isErrorNode ? "text-red-400" : "text-cyan-400") : "text-slate-500"
+                  isCompleted ? "text-gray-900" : isActive ? (isErrorNode ? "text-red-600" : "text-blue-600") : "text-gray-400"
                 )}>
                   {stage.label}
                 </span>
               </div>
-              
-              {/* Connector line overlay for active/completed segments */}
-              {idx < STAGES.length - 1 && (
-                <>
-                  {/* Desktop Active line */}
-                  <div className="hidden md:block absolute top-5 left-[calc(50%+20px)] w-[calc(100%-40px)] h-[2px] -z-10 origin-left">
-                    <motion.div 
-                      className={cn("h-full", isCompleted ? "bg-emerald-400/50" : isActive ? "bg-cyan-500/50" : "bg-transparent")}
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: (isCompleted || isActive) ? 1 : 0 }}
-                      transition={{ duration: 0.5 }}
-                      style={{ transformOrigin: 'left' }}
-                    />
-                  </div>
-                  {/* Mobile Active line */}
-                  <div className="block md:hidden absolute top-[40px] left-5 w-[2px] h-[calc(100%-40px)] -z-10 origin-top">
-                    <motion.div 
-                      className={cn("w-full", isCompleted ? "bg-emerald-400/50" : isActive ? "bg-cyan-500/50" : "bg-transparent")}
-                      initial={{ scaleY: 0 }}
-                      animate={{ scaleY: (isCompleted || isActive) ? 1 : 0 }}
-                      transition={{ duration: 0.5 }}
-                      style={{ transformOrigin: 'top' }}
-                    />
-                  </div>
-                </>
-              )}
             </div>
           );
         })}

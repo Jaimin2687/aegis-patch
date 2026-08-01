@@ -1,6 +1,5 @@
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
-import { dark } from '@clerk/themes';
 import './globals.css';
 
 const inter = Inter({
@@ -32,63 +31,60 @@ export const viewport = {
 };
 
 const clerkAppearance = {
-  baseTheme: dark,
   layout: {
     logoPlacement: 'none',
     showOptionalFields: false,
     socialButtonsVariant: 'iconButton',
   },
   variables: {
-    colorPrimary: '#22d3ee',
-    colorBackground: '#161616',
-    colorInputBackground: '#1f1f1f',
-    colorInputText: '#ffffff',
-    colorText: '#ffffff',
-    colorTextSecondary: '#bbbbbb',
-    colorTextOnPrimaryBackground: '#000000',
+    colorPrimary: '#111827',
+    colorBackground: '#ffffff',
+    colorInputBackground: '#ffffff',
+    colorInputText: '#111827',
+    colorText: '#111827',
+    colorTextSecondary: '#4b5563',
+    colorTextOnPrimaryBackground: '#ffffff',
     colorDanger: '#ef4444',
-    colorSuccess: '#22d3ee',
-    colorNeutral: '#ffffff',
-    colorShimmer: '#ffffff10',
+    colorSuccess: '#10b981',
+    colorNeutral: '#111827',
+    colorShimmer: '#f3f4f6',
     borderRadius: '0.75rem',
     fontFamily: 'var(--font-inter), system-ui, sans-serif',
     fontFamilyButtons: 'var(--font-inter), system-ui, sans-serif',
     fontSize: '14px',
   },
   elements: {
-    card: 'bg-[#161616] border border-white/10 shadow-2xl',
-    headerTitle: 'text-white',
-    headerSubtitle: 'text-[#bbbbbb]',
-    formButtonPrimary: 'bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-black font-semibold',
-    formFieldInput: 'bg-[#1f1f1f] border-white/15 text-white placeholder-slate-500 focus:border-cyan-500/60',
-    formFieldLabel: 'text-[#cccccc] font-medium',
-    footerAction: 'text-[#aaaaaa]',
-    footerActionLink: 'text-cyan-400 hover:text-cyan-300',
-    dividerLine: 'bg-white/10',
-    dividerText: 'text-[#888888]',
-    socialButtonsBlockButton: 'bg-[#1f1f1f] border-white/15 text-white hover:bg-[#2a2a2a]',
-    socialButtonsBlockButtonText: 'text-white',
+    card: 'bg-white border border-gray-200 shadow-sm',
+    headerTitle: 'text-gray-900',
+    headerSubtitle: 'text-gray-500',
+    formButtonPrimary: 'bg-gray-900 hover:bg-gray-800 text-white font-semibold',
+    formFieldInput: 'bg-white border border-gray-200 text-gray-900 placeholder-gray-500 focus:border-gray-400',
+    formFieldLabel: 'text-gray-700 font-medium',
+    footerAction: 'text-gray-500',
+    footerActionLink: 'text-blue-600 hover:text-blue-700',
+    dividerLine: 'bg-gray-200',
+    dividerText: 'text-gray-500',
+    socialButtonsBlockButton: 'bg-white border border-gray-200 text-gray-900 hover:bg-gray-50',
+    socialButtonsBlockButtonText: 'text-gray-900',
     badge: 'hidden',
     logoBox: 'hidden',
-    // UserButton popup
-    userButtonPopoverCard: 'bg-[#161616] border border-white/10 shadow-2xl',
-    userButtonPopoverActions: 'bg-[#161616]',
-    userButtonPopoverActionButton: 'hover:bg-white/10 transition-colors',
-    userButtonPopoverActionButtonText: '!text-white font-medium',
-    userButtonPopoverActionButtonIcon: '!text-white',
-    userButtonPopoverFooter: 'border-t border-white/10',
-    userPreviewMainIdentifier: '!text-white font-semibold',
-    userPreviewSecondaryIdentifier: '!text-[#bbbbbb]',
-    userButtonAvatarBox: 'ring-2 ring-white/15',
+    userButtonPopoverCard: 'bg-white border border-gray-200 shadow-sm',
+    userButtonPopoverActions: 'bg-white',
+    userButtonPopoverActionButton: 'hover:bg-gray-50 transition-colors',
+    userButtonPopoverActionButtonText: '!text-gray-900 font-medium',
+    userButtonPopoverActionButtonIcon: '!text-gray-500',
+    userButtonPopoverFooter: 'border-t border-gray-200',
+    userPreviewMainIdentifier: '!text-gray-900 font-semibold',
+    userPreviewSecondaryIdentifier: '!text-gray-500',
+    userButtonAvatarBox: 'ring-2 ring-gray-100',
   },
 };
-
 
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider appearance={clerkAppearance}>
-      <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark`}>
-        <body className="bg-black text-white antialiased">
+      <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+        <body className="bg-gray-50 text-gray-900 antialiased">
           {children}
         </body>
       </html>

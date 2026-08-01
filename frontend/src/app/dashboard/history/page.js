@@ -29,20 +29,17 @@ export default function ScanHistoryPage() {
         setHistory(data);
       }
     } catch (err) {
-      console.error('Failed to fetch scan history:', err);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch on mount + poll every 5 seconds for live updates
   useEffect(() => {
     fetchHistory();
     const interval = setInterval(fetchHistory, 5000);
     return () => clearInterval(interval);
   }, [fetchHistory]);
 
-  // Lock body scroll when modal is open
   useEffect(() => {
     if (!selectedScan) return;
 
@@ -87,17 +84,24 @@ export default function ScanHistoryPage() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
-      <SectionHeading 
-        eyebrow="Audit Log" 
-        title="Scan History" 
-        subtitle="Review previous autonomous patching pipelines, inspect detected vulnerabilities, and access generated pull requests."
-      />
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1, transition: { staggerChildren: 0.1 } }} 
+      className="w-full max-w-5xl mx-auto space-y-8 pb-12"
+    >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 200, damping: 20 } }}>
+        <SectionHeading 
+          eyebrow="Audit Log" 
+          title="Scan History" 
+          subtitle="Review previous autonomous patching pipelines, inspect detected vulnerabilities, and access generated pull requests."
+        />
+      </motion.div>
 
-      <SpotlightCard className="p-0 overflow-hidden">
+      <motion.div initial={{ opacity: 0, y: 20, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 200, damping: 20, delay: 0.1 } }}>
+      <SpotlightCard className="p-0 overflow-hidden bg-white border border-gray-200 shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-white/10">
+            <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
               <tr>
                 <th scope="col" className="px-6 py-4 font-medium">Repository</th>
                 <th scope="col" className="px-6 py-4 font-medium">Date</th>
@@ -111,7 +115,7 @@ export default function ScanHistoryPage() {
               <AnimatePresence>
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                       <div className="flex items-center justify-center gap-2">
                         <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
@@ -123,50 +127,50 @@ export default function ScanHistoryPage() {
                   </tr>
                 ) : history.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                       No scans yet. Run a pipeline from the Dashboard to see results here.
                     </td>
                   </tr>
                 ) : (
-                  history.map((item) => {
+                  history.map((item, index) => {
                     const status = statusConfig[item.status] || statusConfig.running;
                     return (
                       <motion.tr
                         key={item.id}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24, delay: index * 0.05 } }}
                         exit={{ opacity: 0 }}
                         onClick={() => setSelectedScan(item)}
-                        className="border-b border-white/5 hover:bg-white/[0.04] cursor-pointer transition-colors group"
+                        className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors group"
                       >
-                        <td className="px-6 py-4 font-medium text-slate-200">
+                        <td className="px-6 py-4 font-medium text-gray-900">
                           <div className="flex items-center space-x-2">
-                            <svg className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors shrink-0" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                             </svg>
-                            <span className="truncate max-w-[200px] group-hover:text-cyan-300 transition-colors">{item.repo}</span>
+                            <span className="truncate max-w-[200px] transition-colors">{item.repo}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-slate-400 whitespace-nowrap">{formatDate(item.date)}</td>
-                        <td className="px-6 py-4 text-slate-300 font-mono">
-                          <span className="bg-slate-800 px-2 py-0.5 rounded border border-white/10">{item.vulnsFound}</span>
+                        <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{formatDate(item.date)}</td>
+                        <td className="px-6 py-4 text-gray-900 font-mono">
+                          <span className="bg-gray-100 px-2 py-0.5 rounded border border-gray-200">{item.vulnsFound}</span>
                         </td>
                         <td className="px-6 py-4">
                           <Badge variant={status.variant}>
                             {item.status === 'running' && (
                               <span className="relative flex h-2 w-2 mr-1.5">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                               </span>
                             )}
                             {status.label}
                           </Badge>
                         </td>
-                        <td className="px-6 py-4 text-slate-400 font-mono">{item.duration || '—'}</td>
+                        <td className="px-6 py-4 text-gray-500 font-mono">{item.duration || '—'}</td>
                         <td className="px-6 py-4">
                           <button
                             onClick={(e) => { e.stopPropagation(); setSelectedScan(item); }}
-                            className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center space-x-1"
+                            className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center space-x-1"
                           >
                             <span>Inspect Scan</span>
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,56 +187,52 @@ export default function ScanHistoryPage() {
           </table>
         </div>
       </SpotlightCard>
+      </motion.div>
 
-      {/* ─── Detailed History Inspection Modal ─── */}
       <AnimatePresence>
         {selectedScan && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedScan(null)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-md"
+              className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"
             />
 
-            {/* Modal Container */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-4xl bg-[#0e0e11] border border-white/15 rounded-2xl shadow-2xl shadow-cyan-950/40 overflow-hidden z-10 my-8 text-slate-200"
+              className="relative w-full max-w-4xl bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden z-10 my-8 text-gray-900"
             >
-              {/* Header Accent Bar */}
-              <div className="h-1.5 w-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-500" />
+              <div className="h-1.5 w-full bg-gray-800" />
 
               <div className="p-6 sm:p-8 space-y-6 max-h-[85vh] overflow-y-auto custom-scrollbar">
                 
-                {/* 1. Modal Header */}
-                <div className="flex justify-between items-start gap-4 pb-4 border-b border-white/10">
+                <div className="flex justify-between items-start gap-4 pb-4 border-b border-gray-100">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-mono text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-0.5 rounded-full font-semibold">
+                      <span className="text-xs font-mono text-gray-600 bg-gray-100 border border-gray-200 px-2.5 py-0.5 rounded-full font-semibold">
                         Session: {selectedScan.id.slice(0, 8)}...
                       </span>
                       <Badge variant={(statusConfig[selectedScan.status] || statusConfig.running).variant}>
                         {selectedScan.status.toUpperCase()}
                       </Badge>
                     </div>
-                    <h2 className="text-2xl font-bold text-white tracking-tight pt-1 flex items-center gap-2">
-                      <svg className="w-6 h-6 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <h2 className="text-2xl font-bold text-gray-900 tracking-tight pt-1 flex items-center gap-2">
+                      <svg className="w-6 h-6 text-gray-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                       </svg>
                       {selectedScan.repo}
                     </h2>
-                    <p className="text-xs text-slate-400 font-mono pt-0.5">Scanned on {formatDate(selectedScan.date)}</p>
+                    <p className="text-xs text-gray-500 font-mono pt-0.5">Scanned on {formatDate(selectedScan.date)}</p>
                   </div>
 
                   <button
                     onClick={() => setSelectedScan(null)}
-                    className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors shrink-0"
+                    className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -240,26 +240,25 @@ export default function ScanHistoryPage() {
                   </button>
                 </div>
 
-                {/* 2. Key Metrics Bar */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-slate-900/80 border border-white/10 p-4 rounded-xl space-y-1">
-                    <div className="text-xs text-slate-400 font-medium">Vulnerabilities Detected</div>
-                    <div className="text-2xl font-bold text-white font-mono">{selectedScan.vulnsFound}</div>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1">
+                    <div className="text-xs text-gray-500 font-medium">Vulnerabilities Detected</div>
+                    <div className="text-2xl font-bold text-gray-900 font-mono">{selectedScan.vulnsFound}</div>
                   </div>
 
-                  <div className="bg-slate-900/80 border border-white/10 p-4 rounded-xl space-y-1">
-                    <div className="text-xs text-slate-400 font-medium">Pipeline Duration</div>
-                    <div className="text-2xl font-bold text-white font-mono">{selectedScan.duration || '—'}</div>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1">
+                    <div className="text-xs text-gray-500 font-medium">Pipeline Duration</div>
+                    <div className="text-2xl font-bold text-gray-900 font-mono">{selectedScan.duration || '—'}</div>
                   </div>
 
-                  <div className="bg-slate-900/80 border border-white/10 p-4 rounded-xl space-y-1">
-                    <div className="text-xs text-slate-400 font-medium">Pull Request Status</div>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1">
+                    <div className="text-xs text-gray-500 font-medium">Pull Request Status</div>
                     {selectedScan.prUrl ? (
                       <a
                         href={selectedScan.prUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-cyan-400 hover:text-cyan-300 underline font-medium flex items-center gap-1 pt-1 truncate"
+                        className="text-sm text-blue-600 hover:text-blue-800 underline font-medium flex items-center gap-1 pt-1 truncate"
                       >
                         <span>View Open PR</span>
                         <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,16 +266,15 @@ export default function ScanHistoryPage() {
                         </svg>
                       </a>
                     ) : (
-                      <div className="text-sm text-slate-500 pt-1">No PR generated</div>
+                      <div className="text-sm text-gray-500 pt-1">No PR generated</div>
                     )}
                   </div>
                 </div>
 
-                {/* 3. Vulnerability Breakdown Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-white flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                       Detected Vulnerabilities ({selectedScan.vulns ? selectedScan.vulns.length : selectedScan.vulnsFound})
@@ -286,13 +284,13 @@ export default function ScanHistoryPage() {
                   {selectedScan.vulns && selectedScan.vulns.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {selectedScan.vulns.map((v, idx) => (
-                        <VulnCard key={v.cveId || v.ghsaId || `${v.packageName || 'vuln'}-${v.installedVersion || ''}-${idx}`} vuln={v} />
+                        <VulnCard key={`${v.cveId || v.ghsaId || v.packageName || 'vuln'}-${idx}`} vuln={v} />
                       ))}
                     </div>
                   ) : (
-                    <div className="bg-slate-900/50 border border-white/10 p-6 rounded-xl text-center text-slate-400 space-y-1">
+                    <div className="bg-gray-50 border border-gray-200 p-6 rounded-xl text-center text-gray-500 space-y-1">
                       <p className="text-sm font-medium">Summary Report Only</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-gray-400">
                         {selectedScan.vulnsFound > 0 
                           ? `${selectedScan.vulnsFound} vulnerability flags detected during this run.`
                           : 'Zero vulnerabilities were detected during this scan execution.'}
@@ -301,12 +299,11 @@ export default function ScanHistoryPage() {
                   )}
                 </div>
 
-                {/* 4. Execution Logs Toggle & Viewer */}
                 {selectedScan.logs && selectedScan.logs.length > 0 && (
                   <div className="space-y-3 pt-2">
                     <button
                       onClick={() => setShowLogs((v) => !v)}
-                      className="text-xs text-slate-400 hover:text-white flex items-center gap-2 font-medium transition-colors"
+                      className="text-xs text-gray-500 hover:text-gray-900 flex items-center gap-2 font-medium transition-colors"
                     >
                       <svg className={`w-4 h-4 transform transition-transform ${showLogs ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -322,13 +319,12 @@ export default function ScanHistoryPage() {
                   </div>
                 )}
 
-                {/* 5. Footer Actions */}
-                <div className="pt-4 flex items-center justify-between gap-4 border-t border-white/10">
+                <div className="pt-4 flex items-center justify-between gap-4 border-t border-gray-200">
                   <button
                     onClick={() => handleOpenActiveWorkspace(selectedScan)}
-                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-md"
+                    className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 hover:text-gray-900 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm"
                   >
-                    <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -337,7 +333,7 @@ export default function ScanHistoryPage() {
 
                   <button
                     onClick={() => setSelectedScan(null)}
-                    className="px-5 py-2 bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-black font-semibold text-xs rounded-xl shadow-lg transition-all"
+                    className="px-5 py-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-xs rounded-xl shadow-sm transition-all"
                   >
                     Close Inspection
                   </button>
@@ -348,6 +344,6 @@ export default function ScanHistoryPage() {
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }

@@ -25,7 +25,7 @@ export default function Sidebar({ currentStage }) {
             <svg className="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            <h2 className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">
+            <h2 className="font-bold text-lg text-gray-900">
               AEGIS-PATCH
             </h2>
           </div>
