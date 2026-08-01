@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GlowInput } from '@/components/ui/glow-input';
 import useWebSocket from '@/lib/useWebSocket';
@@ -21,6 +21,10 @@ export default function DashboardPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
+  // Vulnerability search & severity filtering state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSeverity, setSelectedSeverity] = useState('ALL');
+
   const { sessionId, stage, logs, vulns, result, error: wsError, connectionStatus, startSession, clearSession } = useWebSocket();
 
   // Keep pipelineStarted in sync if session ID exists
@@ -35,6 +39,8 @@ export default function DashboardPage() {
     setPipelineStarted(false);
     setRepoUrl('');
     setSubmitError(null);
+    setSearchQuery('');
+    setSelectedSeverity('ALL');
   };
 
   const handleSubmit = async (e) => {
@@ -73,6 +79,52 @@ export default function DashboardPage() {
     }
   };
 
+  // Severity counts computation
+  const severityCounts = useMemo(() => {
+    const counts = { ALL: vulns.length, CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
+    vulns.forEach(v => {
+      const sev = (v.severity || 'MEDIUM').toUpperCase();
+      if (counts[sev] !== undefined) counts[sev]++;
+    });
+    return counts;
+  }, [vulns]);
+
+  // Filtered vulnerabilities list
+  const filteredVulns = useMemo(() => {
+    return vulns.filter(v => {
+      const matchesSeverity = selectedSeverity === 'ALL' || (v.severity || '').toUpperCase() === selectedSeverity;
+      const q = searchQuery.trim().toLowerCase();
+      const matchesQuery = !q || 
+        (v.packageName || '').toLowerCase().includes(q) ||
+        (v.cveId || '').toLowerCase().includes(q) ||
+        (v.ghsaId || '').toLowerCase().includes(q) ||
+        (v.title || '').toLowerCase().includes(q);
+      return matchesSeverity && matchesQuery;
+    });
+  }, [vulns, selectedSeverity, searchQuery]);
+
+  // Export audit report as JSON
+  const handleExportReport = () => {
+    const reportData = {
+      sessionId,
+      repoUrl,
+      timestamp: new Date().toISOString(),
+      summary: {
+        totalVulnerabilities: vulns.length,
+        severityBreakdown: severityCounts,
+        prUrl: result?.prUrl || null
+      },
+      vulnerabilities: vulns
+    };
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `aegis-audit-report-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } }
@@ -92,15 +144,29 @@ export default function DashboardPage() {
         </div>
 
         {pipelineStarted && (
-          <button
-            onClick={handleStartNewScan}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-white/15 text-slate-200 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-md hover:border-cyan-500/30"
-          >
-            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Start New Scan</span>
-          </button>
+          <div className="flex items-center gap-3">
+            {vulns.length > 0 && (
+              <button
+                onClick={handleExportReport}
+                className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md"
+                title="Export audit report as JSON"
+              >
+                <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Export Report</span>
+              </button>
+            )}
+            <button
+              onClick={handleStartNewScan}
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-white/15 text-slate-200 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-md hover:border-cyan-500/30"
+            >
+              <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Start New Scan</span>
+            </button>
+          </div>
         )}
       </header>
 
@@ -173,19 +239,69 @@ export default function DashboardPage() {
 
             {vulns.length > 0 && (
               <motion.div variants={itemVariants} className="space-y-4">
-                <h3 className="text-lg font-medium text-white flex items-center gap-2">
-                  <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  Detected Vulnerabilities ({vulns.length})
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <AnimatePresence>
-                    {vulns.map((vuln) => (
-                      <VulnCard key={vuln.cveId || vuln.ghsaId || Math.random().toString()} vuln={vuln} />
-                    ))}
-                  </AnimatePresence>
+                {/* Vulnerability Filter Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/40 p-4 rounded-2xl border border-white/10">
+                  <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    Detected Vulnerabilities ({filteredVulns.length} of {vulns.length})
+                  </h3>
+
+                  {/* Filter Pills & Search */}
+                  <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
+                    {/* Search Input */}
+                    <div className="relative flex-1 sm:w-64">
+                      <svg className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search package or CVE..."
+                        className="w-full bg-slate-950/80 border border-white/15 focus:border-cyan-500/60 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 outline-none transition-colors"
+                      />
+                    </div>
+
+                    {/* Severity Pills */}
+                    <div className="flex items-center gap-1 bg-black/60 p-1 rounded-xl border border-white/10 text-xs font-medium">
+                      {['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(sev => {
+                        const count = severityCounts[sev] || 0;
+                        if (sev !== 'ALL' && count === 0) return null;
+                        const isSelected = selectedSeverity === sev;
+                        return (
+                          <button
+                            key={sev}
+                            onClick={() => setSelectedSeverity(sev)}
+                            className={`px-2.5 py-1 rounded-lg transition-all text-[11px] ${
+                              isSelected
+                                ? 'bg-cyan-500 text-black font-bold shadow-sm shadow-cyan-500/30'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            }`}
+                          >
+                            {sev} ({count})
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
+
+                {/* Cards Grid */}
+                {filteredVulns.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <AnimatePresence>
+                      {filteredVulns.map((vuln) => (
+                        <VulnCard key={vuln.cveId || vuln.ghsaId || Math.random().toString()} vuln={vuln} />
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <div className="p-8 text-center bg-slate-900/30 border border-white/5 rounded-xl text-slate-400 text-sm">
+                    No vulnerabilities match your filter criteria "{searchQuery || selectedSeverity}".
+                  </div>
+                )}
               </motion.div>
             )}
 
