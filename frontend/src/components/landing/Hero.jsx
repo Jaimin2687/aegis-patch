@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { Badge } from '@/components/ui/badge';
 import { ShimmerButton } from '@/components/ui/shimmer-button';
 
-const HeroScene = dynamic(() => import('@/components/three/HeroScene').catch(() => () => null), { ssr: false });
+const HeroScene = dynamic(() => import('@/components/three/HeroScene').then(mod => mod.HeroScene), { ssr: false });
 
 const containerVariants = {
   hidden: { opacity: 0 },
