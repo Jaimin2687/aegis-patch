@@ -121,7 +121,7 @@ export default function VulnCard({ vuln }) {
               <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full bg-gradient-to-r ${severityConfig.gradient} transition-all duration-1000 ease-out`}
-                  style={{ width: `${(cvss / 10) * 100}%` }}
+                  style={{ width: `${(Math.min(Math.max(cvss, 0), 10) / 10) * 100}%` }}
                 />
               </div>
             </div>
