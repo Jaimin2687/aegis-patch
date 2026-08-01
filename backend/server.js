@@ -6,6 +6,9 @@ import config from './src/core/config.js';
 import eventBus, { EventTypes } from './src/core/eventBus.js';
 import { executePipeline } from './src/core/pipeline.js';
 
+// In-memory scan history
+const scanHistory = [];
+
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', config.FRONTEND_URL || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -31,9 +34,28 @@ const server = http.createServer((req, res) => {
 
         const sessionId = uuidv4();
         
+        // Track scan in history
+        const scanRecord = {
+          id: sessionId,
+          repo: repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, ''),
+          repoUrl,
+          date: new Date().toISOString(),
+          status: 'running',
+          vulnsFound: 0,
+          duration: null,
+          prUrl: null,
+          startTime: Date.now()
+        };
+        scanHistory.unshift(scanRecord);
+
         // Fire and forget pipeline execution
         executePipeline(repoUrl, sessionId).catch(err => {
           console.error(`Pipeline error for ${sessionId}:`, err);
+          const record = scanHistory.find(s => s.id === sessionId);
+          if (record) {
+            record.status = 'error';
+            record.duration = `${((Date.now() - record.startTime) / 1000).toFixed(0)}s`;
+          }
         });
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -43,6 +65,9 @@ const server = http.createServer((req, res) => {
         res.end(JSON.stringify({ error: 'Invalid JSON body' }));
       }
     });
+  } else if (req.method === 'GET' && req.url === '/api/history') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(scanHistory.slice(0, 50)));
   } else if (req.method === 'GET' && req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok' }));
@@ -83,11 +108,28 @@ wss.on('connection', (ws, req) => {
 Object.values(EventTypes).forEach(eventType => {
   eventBus.on(eventType, (eventData) => {
     const sessionId = eventData.sessionId;
+
+    // Update scan history on events
+    const record = scanHistory.find(s => s.id === sessionId);
+    if (record) {
+      if (eventType === EventTypes.VULN_FOUND) {
+        record.vulnsFound++;
+      } else if (eventType === EventTypes.COMPLETE) {
+        record.status = 'success';
+        record.duration = eventData.data?.totalTime || `${((Date.now() - record.startTime) / 1000).toFixed(0)}s`;
+        record.prUrl = eventData.data?.prUrl || null;
+      } else if (eventType === EventTypes.ERROR) {
+        record.status = 'error';
+        record.duration = `${((Date.now() - record.startTime) / 1000).toFixed(0)}s`;
+      }
+    }
+
+    // Broadcast to WebSocket clients
     const sessionClients = clients.get(sessionId);
     if (sessionClients) {
       const message = JSON.stringify({ type: eventType, ...eventData });
       sessionClients.forEach(client => {
-        if (client.readyState === 1) { // WebSocket.OPEN
+        if (client.readyState === 1) {
           client.send(message);
         }
       });
