@@ -1,37 +1,59 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export default function useWebSocket() {
-  const [sessionId, setSessionId] = useState(null);
-  const [stage, setStage] = useState('');
-  const [logs, setLogs] = useState([]);
-  const [vulns, setVulns] = useState([]);
-  const [result, setResult] = useState(null);
+  const [sessionId, setSessionId] = useState(() => {
+    if (typeof window !== 'undefined') return sessionStorage.getItem('aegis_session_id') || null;
+    return null;
+  });
+  const [stage, setStage] = useState(() => {
+    if (typeof window !== 'undefined') return sessionStorage.getItem('aegis_stage') || '';
+    return '';
+  });
+  const [logs, setLogs] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try { return JSON.parse(sessionStorage.getItem('aegis_logs')) || []; } catch { return []; }
+    }
+    return [];
+  });
+  const [vulns, setVulns] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try { return JSON.parse(sessionStorage.getItem('aegis_vulns')) || []; } catch { return []; }
+    }
+    return [];
+  });
+  const [result, setResult] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try { return JSON.parse(sessionStorage.getItem('aegis_result')) || null; } catch { return null; }
+    }
+    return null;
+  });
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('CLOSED');
 
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
-  const stageRef = useRef('');
+  const stageRef = useRef(stage);
+
+  // Sync state to sessionStorage whenever updated
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (sessionId) sessionStorage.setItem('aegis_session_id', sessionId);
+    if (stage) sessionStorage.setItem('aegis_stage', stage);
+    if (logs.length > 0) sessionStorage.setItem('aegis_logs', JSON.stringify(logs));
+    if (vulns.length > 0) sessionStorage.setItem('aegis_vulns', JSON.stringify(vulns));
+    if (result) sessionStorage.setItem('aegis_result', JSON.stringify(result));
+  }, [sessionId, stage, logs, vulns, result]);
 
   // Connect only when a sessionId is provided
   useEffect(() => {
     if (!sessionId) return;
 
-    // Reset pipeline state for new session
-    setLogs([]);
-    setStage('');
-    setVulns([]);
-    setResult(null);
-    setError(null);
-    stageRef.current = '';
-
     const connect = () => {
       setConnectionStatus('CONNECTING');
 
-      let backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      let backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
       backendUrl = backendUrl.replace(/\/+$/, '');
-      // Backend expects: ws://host:port/ws?sessionId=xxx
       const wsUrl = backendUrl.replace(/^http/, 'ws') + `/ws?sessionId=${sessionId}`;
 
       const ws = new WebSocket(wsUrl);
@@ -39,6 +61,7 @@ export default function useWebSocket() {
 
       ws.onopen = () => {
         setConnectionStatus('OPEN');
+        setError(null); // Clear transient connection errors once connected
         reconnectAttemptsRef.current = 0;
       };
 
@@ -47,39 +70,42 @@ export default function useWebSocket() {
           const data = JSON.parse(event.data);
 
           if (data.type === 'LOG') {
-            // Backend sends: { type, sessionId, timestamp, stage, level, message, data }
-            // The log IS the top-level object, not nested in .data
             const logEntry = {
               timestamp: data.timestamp,
               stage: data.stage,
               level: data.level,
               message: data.message,
             };
-            setLogs(prev => [...prev, logEntry].slice(-1000));
+            setLogs(prev => {
+              const updated = [...prev, logEntry].slice(-1000);
+              if (typeof window !== 'undefined') sessionStorage.setItem('aegis_logs', JSON.stringify(updated));
+              return updated;
+            });
             if (data.stage && data.stage !== stageRef.current) {
               stageRef.current = data.stage;
               setStage(data.stage);
             }
           } else if (data.type === 'STAGE_CHANGE') {
-            // Backend sends: { type, sessionId, from, to }
             stageRef.current = data.to || '';
             setStage(stageRef.current);
           } else if (data.type === 'VULN_FOUND') {
-            // Backend sends: { type, sessionId, data: { cveId, ... } }
             setVulns(prev => {
               const vuln = data.data;
               if (!vuln) return prev;
-              if (prev.some(v => v.cveId === vuln.cveId)) return prev;
-              return [...prev, vuln];
+              if (prev.some(v => (v.cveId && v.cveId === vuln.cveId) || (v.ghsaId && v.ghsaId === vuln.ghsaId))) return prev;
+              const updated = [...prev, vuln];
+              if (typeof window !== 'undefined') sessionStorage.setItem('aegis_vulns', JSON.stringify(updated));
+              return updated;
             });
           } else if (data.type === 'ERROR') {
-            // Backend sends: { type, sessionId, message, stage, fatal }
             setError(data.message || 'Pipeline error');
           } else if (data.type === 'COMPLETE') {
-            // Backend sends: { type, sessionId, data: { ... } }
             stageRef.current = 'COMPLETE';
             setStage('COMPLETE');
-            if (data.data) setResult(data.data);
+            if (data.data) {
+              setResult(data.data);
+              if (typeof window !== 'undefined') sessionStorage.setItem('aegis_result', JSON.stringify(data.data));
+            }
           }
         } catch (e) {
           console.error('Failed to parse WebSocket message', e);
@@ -88,8 +114,7 @@ export default function useWebSocket() {
 
       ws.onclose = (event) => {
         setConnectionStatus('CLOSED');
-        // Do not reconnect if completed or clean close
-        if (stageRef.current === 'COMPLETE' || event.code === 1000) return;
+        if (stageRef.current === 'COMPLETE' || stageRef.current === 'ERROR' || event.code === 1000 || event.code === 1008) return;
 
         const timeout = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
         reconnectAttemptsRef.current += 1;
@@ -100,7 +125,9 @@ export default function useWebSocket() {
       };
 
       ws.onerror = () => {
-        setError('WebSocket connection error.');
+        if (ws.readyState !== WebSocket.OPEN) {
+          setError('WebSocket connection error.');
+        }
       };
     };
 
@@ -114,10 +141,41 @@ export default function useWebSocket() {
     };
   }, [sessionId]);
 
-  // Called by dashboard after POST /api/patch returns the backend's sessionId
   const startSession = useCallback((backendSessionId) => {
+    // Reset state for new session
     setSessionId(backendSessionId);
+    setLogs([]);
+    setStage('');
+    setVulns([]);
+    setResult(null);
+    setError(null);
+    stageRef.current = '';
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('aegis_session_id', backendSessionId);
+      sessionStorage.removeItem('aegis_logs');
+      sessionStorage.removeItem('aegis_vulns');
+      sessionStorage.removeItem('aegis_result');
+      sessionStorage.removeItem('aegis_stage');
+    }
   }, []);
 
-  return { sessionId, stage, logs, vulns, result, error, connectionStatus, startSession };
+  const clearSession = useCallback(() => {
+    setSessionId(null);
+    setStage('');
+    setLogs([]);
+    setVulns([]);
+    setResult(null);
+    setError(null);
+    stageRef.current = '';
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('aegis_session_id');
+      sessionStorage.removeItem('aegis_stage');
+      sessionStorage.removeItem('aegis_logs');
+      sessionStorage.removeItem('aegis_vulns');
+      sessionStorage.removeItem('aegis_result');
+      sessionStorage.removeItem('aegis_repo_url');
+    }
+  }, []);
+
+  return { sessionId, stage, logs, vulns, result, error, connectionStatus, startSession, clearSession };
 }

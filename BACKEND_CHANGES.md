@@ -29,6 +29,7 @@ Triggers the security patching pipeline for a target GitHub repository.
   ```
 
 #### `GET /api/history`
+Returns historical scan execution records. Each record contains summary metrics as well as the complete list of detected vulnerabilities (`vulns`) and execution logs (`logs`) for deep historical inspection in the frontend UI.
 Returns historical scan execution records.
 - **Response (200 OK)**:
   ```json
@@ -36,6 +37,25 @@ Returns historical scan execution records.
     {
       "id": "session-1",
       "repo": "owner/repository",
+      "repoUrl": "https://github.com/owner/repository",
+      "date": "2026-08-01T12:00:00.000Z",
+      "status": "success",
+      "vulnsFound": 3,
+      "vulns": [
+        {
+          "packageName": "lodash",
+          "installedVersion": "4.17.15",
+          "targetVersion": "4.17.21",
+          "cveId": "CVE-2021-23337",
+          "severity": "HIGH",
+          "cvssScore": 7.5,
+          "title": "Command Injection in lodash",
+          "description": "Vulnerable to Command Injection via template functions..."
+        }
+      ],
+      "logs": [
+        { "stage": "SCANNING", "level": "INFO", "message": "Parsing lockfiles..." }
+      ],
       "date": "2026-08-01T12:00:00.000Z",
       "vulnsFound": 3,
       "status": "completed",
