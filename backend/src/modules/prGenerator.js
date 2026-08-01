@@ -35,7 +35,12 @@ export async function generatePR(repoPath, repoUrl, vulnReports, regressionResul
   await git.commit('fix: Patch security vulnerabilities');
 
   const remoteUrl = `https://x-access-token:${config.GITHUB_TOKEN}@github.com/${owner}/${repo}.git`;
-  await git.addRemote('aegis-remote', remoteUrl);
+  try {
+    await git.addRemote('aegis-remote', remoteUrl);
+  } catch (err) {
+    await git.removeRemote('aegis-remote');
+    await git.addRemote('aegis-remote', remoteUrl);
+  }
   await git.push(['-u', 'aegis-remote', branchName]);
 
   const octokit = new Octokit({ auth: config.GITHUB_TOKEN });

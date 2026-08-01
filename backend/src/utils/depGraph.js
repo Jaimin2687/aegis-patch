@@ -4,9 +4,9 @@ import path from 'path';
 /**
  * Parses npm package-lock.json
  */
-export function parseNpmLockfile(lockfilePath) {
+export async function parseNpmLockfile(lockfilePath) {
   if (!fs.existsSync(lockfilePath)) return { packages: new Map(), totalDeps: 0, maxDepth: 0 };
-  const lockfileContent = fs.readFileSync(lockfilePath, 'utf-8');
+  const lockfileContent = await fs.promises.readFile(lockfilePath, 'utf-8');
   const lockData = JSON.parse(lockfileContent);
   const packagesMap = new Map();
   let maxDepth = 0;
@@ -38,9 +38,9 @@ export function parseNpmLockfile(lockfilePath) {
 /**
  * Parses Python requirements.txt (simplified)
  */
-export function parseRequirementsTxt(filePath) {
+export async function parseRequirementsTxt(filePath) {
   if (!fs.existsSync(filePath)) return { packages: new Map(), totalDeps: 0, maxDepth: 1 };
-  const content = fs.readFileSync(filePath, 'utf-8');
+  const content = await fs.promises.readFile(filePath, 'utf-8');
   const packagesMap = new Map();
   
   content.split('\n').forEach(line => {
@@ -58,9 +58,9 @@ export function parseRequirementsTxt(filePath) {
 /**
  * Parses Rust Cargo.toml (simplified dependency extraction)
  */
-export function parseCargoLock(filePath) {
+export async function parseCargoLock(filePath) {
   if (!fs.existsSync(filePath)) return { packages: new Map(), totalDeps: 0, maxDepth: 1 };
-  const content = fs.readFileSync(filePath, 'utf-8');
+  const content = await fs.promises.readFile(filePath, 'utf-8');
   const packagesMap = new Map();
   
   let currentPkg = null;
@@ -83,9 +83,9 @@ export function parseCargoLock(filePath) {
 /**
  * Parses go.mod (simplified)
  */
-export function parseGoMod(filePath) {
+export async function parseGoMod(filePath) {
   if (!fs.existsSync(filePath)) return { packages: new Map(), totalDeps: 0, maxDepth: 1 };
-  const content = fs.readFileSync(filePath, 'utf-8');
+  const content = await fs.promises.readFile(filePath, 'utf-8');
   const packagesMap = new Map();
   
   content.split('\n').forEach(line => {
@@ -108,14 +108,14 @@ export function parseGoMod(filePath) {
 export async function parseDependencies(repoPath, ecosystem) {
   switch (ecosystem) {
     case 'npm':
-      return parseNpmLockfile(path.join(repoPath, 'package-lock.json'));
+      return await parseNpmLockfile(path.join(repoPath, 'package-lock.json'));
     case 'PyPI':
       // Prefer requirements.txt for now
-      return parseRequirementsTxt(path.join(repoPath, 'requirements.txt'));
+      return await parseRequirementsTxt(path.join(repoPath, 'requirements.txt'));
     case 'crates.io':
-      return parseCargoLock(path.join(repoPath, 'Cargo.lock'));
+      return await parseCargoLock(path.join(repoPath, 'Cargo.lock'));
     case 'Go':
-      return parseGoMod(path.join(repoPath, 'go.mod'));
+      return await parseGoMod(path.join(repoPath, 'go.mod'));
     default:
       return { packages: new Map(), totalDeps: 0, maxDepth: 0 };
   }

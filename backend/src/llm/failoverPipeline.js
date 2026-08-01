@@ -83,8 +83,22 @@ export class FailoverPipeline {
       while (providerRetries >= 0) {
         attempts++;
         try {
+          if (name === 'cerebras') {
+            const now = Date.now();
+            if (this.lastCerebrasCallTime && (now - this.lastCerebrasCallTime) < 12000) {
+              const delay = 12000 - (now - this.lastCerebrasCallTime);
+              this.logger.debug('PATCHING', `Waiting ${delay}ms for Cerebras rate limit gap`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            this.lastCerebrasCallTime = Date.now();
+          }
+
           this.logger.debug('PATCHING', `Attempting generation with ${name}`);
           const result = await provider.generate(messages);
+
+          if (result.remainingQuota) {
+            this.logger.debug('PATCHING', `Remaining token quota for ${name}: ${result.remainingQuota}`);
+          }
           
           let content = result.content;
           // Strip markdown fences
@@ -99,6 +113,12 @@ export class FailoverPipeline {
              }
           }
 
+          this.lastMetadata = {
+            provider: name,
+            latencyMs: result.latencyMs,
+            attempts
+          };
+
           return {
             content,
             provider: name,
@@ -107,7 +127,7 @@ export class FailoverPipeline {
           };
         } catch (error) {
           if (error instanceof RateLimitError) {
-            this.logger.warn('PATCHING', `Rate limit hit on ${name}, switching provider.`);
+            this.logger.warn('PATCHING', `Rate limit hit on ${name}. Retry after: ${error.retryAfter}s. Switching provider.`);
             break; // Switch to next provider immediately
           } else {
             this.logger.error('PATCHING', `${name} error: ${error.message}`);

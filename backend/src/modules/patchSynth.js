@@ -73,8 +73,27 @@ export async function synthesizePatch(vulnReport, repoPath, ecosystem, failoverP
       vulnerableFilePath = path.join(repoPath, vulnReport.vulnerableFile);
       vulnerableCode = await fs.readFile(vulnerableFilePath, 'utf8');
     } else if (ecosystem === 'npm') {
-      vulnerableFilePath = path.join(repoPath, 'node_modules', vulnReport.packageName, 'index.js');
-      vulnerableCode = await fs.readFile(vulnerableFilePath, 'utf8');
+      const pkgDir = path.join(repoPath, 'node_modules', vulnReport.packageName);
+      const candidates = [];
+      try {
+        const pkgJson = JSON.parse(await fs.readFile(path.join(pkgDir, 'package.json'), 'utf8'));
+        if (pkgJson.main) candidates.push(pkgJson.main);
+        if (pkgJson.module) candidates.push(pkgJson.module);
+      } catch (err) {}
+      candidates.push('index.js', 'lib/index.js', 'src/index.js');
+
+      let found = false;
+      for (const cand of candidates) {
+        try {
+          vulnerableFilePath = path.join(pkgDir, cand);
+          vulnerableCode = await fs.readFile(vulnerableFilePath, 'utf8');
+          found = true;
+          break;
+        } catch (err) {}
+      }
+      if (!found) {
+        throw new Error(`Could not find entry file for ${vulnReport.packageName}`);
+      }
     } else {
        logger.warn('PATCHING', `Direct source patching for ${ecosystem} is limited. Using heuristic.`);
        const files = await fs.readdir(repoPath);

@@ -59,6 +59,24 @@ export async function scanVulnerabilities(repoPath, lockfileData, ecosystem, fai
 
               const fixCommitUrl = vulnData.references?.find(r => r.type === 'FIX')?.url;
 
+              let cvssScore = 0;
+              const cvssEntry = vulnData.severity?.find(s => s.type === 'CVSS_V3');
+              if (cvssEntry && cvssEntry.score) {
+                // E.g., CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H - OSV sometimes puts vector in score, we need to extract actual score if possible. Wait, OSV severity score is actually the vector string for CVSS_V3, but OSV api often has `score` field with the string. If we need to parse it, that's complex, but let's assume it might have the score or fallback to database_specific.
+                // Re-reading task: "Look for vulnData.severity array, find entry with type: 'CVSS_V3', and parse the score field". I will just use `cvssEntry.score`.
+                // Actually the task asks to parse the `score` field. In OSV, `score` for CVSS_V3 is the vector string. If the user just wants us to extract it, we can extract the number if possible or just use what we can. Let's just do what they said. Wait, `parseFloat` on vector will return NaN. We'll check if we can parse it, or just use `vulnData.database_specific?.cvss?.score`.
+                const maybeScore = parseFloat(cvssEntry.score);
+                if (!isNaN(maybeScore)) cvssScore = maybeScore;
+              }
+              if (!cvssScore && vulnData.database_specific?.cvss) {
+                const dbSpecific = vulnData.database_specific.cvss;
+                if (typeof dbSpecific === 'object' && dbSpecific.score) {
+                   cvssScore = parseFloat(dbSpecific.score) || 0;
+                } else if (typeof dbSpecific === 'number' || typeof dbSpecific === 'string') {
+                   cvssScore = parseFloat(dbSpecific) || 0;
+                }
+              }
+
               const report = {
                 packageName: packageList[i].name,
                 installedVersion: packageList[i].version,
@@ -66,7 +84,7 @@ export async function scanVulnerabilities(repoPath, lockfileData, ecosystem, fai
                 cveId,
                 ghsaId: v.id,
                 severity,
-                cvssScore: 0,
+                cvssScore,
                 title: vulnData.summary || vulnData.details || 'Vulnerability',
                 fixCommitUrl,
                 vulnData

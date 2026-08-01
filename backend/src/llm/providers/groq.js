@@ -63,7 +63,8 @@ export class GroqProvider {
     return {
       content: data.choices[0].message.content,
       tokensUsed: data.usage?.total_tokens || 0,
-      latencyMs
+      latencyMs,
+      remainingQuota: headers['x-ratelimit-remaining-tokens'] || headers['x-ratelimit-remaining']
     };
   }
 }
