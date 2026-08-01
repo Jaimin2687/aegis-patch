@@ -30,6 +30,7 @@ Triggers the security patching pipeline for a target GitHub repository.
 
 #### `GET /api/history`
 Returns historical scan execution records. Each record contains summary metrics as well as the complete list of detected vulnerabilities (`vulns`) and execution logs (`logs`) for deep historical inspection in the frontend UI.
+Returns historical scan execution records.
 - **Response (200 OK)**:
   ```json
   [
@@ -55,6 +56,9 @@ Returns historical scan execution records. Each record contains summary metrics 
       "logs": [
         { "stage": "SCANNING", "level": "INFO", "message": "Parsing lockfiles..." }
       ],
+      "date": "2026-08-01T12:00:00.000Z",
+      "vulnsFound": 3,
+      "status": "completed",
       "duration": "45s",
       "prUrl": "https://github.com/owner/repository/pull/12"
     }

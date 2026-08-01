@@ -227,9 +227,12 @@ export async function scanVulnerabilities(repoPath, lockfileData, ecosystem, fai
       if (codebase.length > 0 && failoverPipeline) {
         const prompt = [
           { role: 'system', content: 'You are a Static Application Security Testing (SAST) tool. Analyze the provided codebase and identify security vulnerabilities. Respond strictly in JSON format.' },
-          { role: 'user', content: `Identify security vulnerabilities in this code:\n${codebase.substring(0, 50000)}\n\nReturn an array of JSON objects matching this format: [{"cveId": "LLM-SAST-1", "title": "Description of vuln", "severity": "HIGH", "file": "path/to/file", "snippet": "vulnerable line of code"}]` }
+          { role: 'user', content: `Identify security vulnerabilities in this code:\n${codebase.substring(0, 50000)}\n\nReturn an array of JSON objects matching this format: [{"cveId": "LLM-SAST-1", "title": "Description of vuln", "severity": "HIGH", "cvssScore": 7.5, "file": "path/to/file", "snippet": "vulnerable line of code"}]` }
         ];
         
+        // Map severity strings to reasonable CVSS scores as fallback
+        const severityCvssMap = { 'CRITICAL': 9.8, 'HIGH': 7.5, 'MEDIUM': 5.5, 'MODERATE': 5.5, 'LOW': 3.0 };
+
         try {
           const { content } = await failoverPipeline.generate(prompt, { format: 'json' });
           let llmVulns = [];
@@ -242,13 +245,15 @@ export async function scanVulnerabilities(repoPath, lockfileData, ecosystem, fai
           }
           
           for (const v of llmVulns) {
+            const sev = (v.severity || 'UNKNOWN').toUpperCase();
+            const cvss = parseFloat(v.cvssScore) || severityCvssMap[sev] || 0;
             const report = {
               packageName: 'source-code',
               installedVersion: 'N/A',
               patchedVersion: null,
               cveId: v.cveId || 'LLM-SAST',
-              severity: v.severity || 'UNKNOWN',
-              cvssScore: 0,
+              severity: sev,
+              cvssScore: cvss,
               title: v.title || 'Vulnerability detected by LLM',
               vulnerableFile: v.file, // Passed for patching
               vulnerableSnippet: v.snippet
