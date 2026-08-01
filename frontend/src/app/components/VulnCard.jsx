@@ -66,6 +66,11 @@ export default function VulnCard({ vuln }) {
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.3, type: 'spring' }}
         className="h-full cursor-pointer group"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') setIsOpen(true);
+        }}
         onClick={() => setIsOpen(true)}
       >
         <SpotlightCard className="h-full p-5 bg-[#0a0a0a] border border-white/10 group-hover:border-cyan-500/50 group-hover:shadow-lg group-hover:shadow-cyan-500/10 transition-all duration-300 rounded-xl flex flex-col gap-4 relative overflow-hidden">
