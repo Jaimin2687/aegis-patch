@@ -22,7 +22,7 @@ export function SectionHeading({ eyebrow, title, subtitle, className }) {
         </span>
       )}
       
-      <h2 className="text-3xl md:text-5xl font-semibold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+      <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-gray-900">
         {title}
       </h2>
       

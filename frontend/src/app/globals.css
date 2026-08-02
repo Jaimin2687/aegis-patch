@@ -1,192 +1,83 @@
 @import "tailwindcss";
 
 @theme {
-  --color-charcoal-deep: #050505;
-  --color-charcoal: #0a0a0a;
-  --color-slate-dark: #111111;
-  --color-grid-line: #222222;
-  --color-muted: #888888;
-  --color-surface: #161b22;
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-mono), 'JetBrains Mono', monospace;
 }
 
-/* ─── Base ─── */
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
-/* ─── Custom Scrollbar ─── */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 4px;
+  background: var(--color-gray-300);
+  border-radius: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #555555;
+  background: var(--color-gray-400);
 }
 
-/* Standard scrollbar for Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #333333 transparent;
+  scrollbar-color: var(--color-gray-300) transparent;
 }
 
-/* ─── Selection ─── */
 ::selection {
-  background: rgba(99, 102, 241, 0.4);
-  color: #ffffff;
-}
-
-/* ─── Glassmorphism ─── */
-.glass-panel {
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* ─── Dot Grid Background ─── */
-.dot-grid {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-/* ─── Radial Fade Mask ─── */
-.radial-fade {
-  mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, black 40%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, black 40%, transparent 100%);
-}
-
-/* ─── Terminal Log Colors ─── */
-.log-info { color: #e2e8f0; }
-.log-warn { color: #fbbf24; }
-.log-error { color: #f87171; }
-.log-success { color: #34d399; }
-.log-debug { color: #818cf8; }
-
-/* ─── Animations ─── */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0); }
-  50% { box-shadow: 0 0 20px 4px rgba(34, 211, 238, 0.15); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes dash {
-  to { stroke-dashoffset: -20; }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  background: rgba(59, 130, 246, 0.2);
+  color: inherit;
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s linear infinite;
-  background-size: 200% 100%;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-dash {
-  animation: dash 1.5s linear infinite;
-}
-
-.animate-blink {
-  animation: blink 1s infinite;
-}
-
 .animate-fade-up {
-  animation: fade-up 0.6s ease-out forwards;
+  animation: fade-up 0.4s ease-out forwards;
 }
 
-.animate-gradient {
-  animation: gradient-shift 3s ease infinite;
-  background-size: 200% 200%;
-}
-
-/* ─── Gradient Border Wrapper ─── */
-.gradient-border {
-  position: relative;
-  background: linear-gradient(135deg, rgba(34, 211, 238, 0.3), rgba(99, 102, 241, 0.3));
-  padding: 1px;
-  border-radius: 12px;
-}
-
-.gradient-border-inner {
-  background: #0a0a0a;
-  border-radius: 11px;
-}
-
-/* ─── Clerk Dark Mode Overrides ─── */
 .cl-userButtonPopoverCard,
 .cl-userProfile-root,
 .cl-profilePage,
 .cl-navbar,
 .cl-pageScrollBox {
-  background-color: #111111 !important;
-  color: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
 }
 
 .cl-userButtonPopoverCard *,
 .cl-userProfile-root * {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: #e5e7eb !important;
 }
 
-/* Aggressively force text colors in the modal */
 .cl-userProfile-root h1,
 .cl-userProfile-root h2,
 .cl-userProfile-root h3,
 .cl-userProfile-root h4 {
-  color: #ffffff !important;
+  color: #111827 !important;
 }
 
 .cl-userProfile-root p,
 .cl-userProfile-root span:not(.cl-badge),
 .cl-userProfile-root div,
 .cl-userProfile-root svg {
-  color: #d1d5db; /* slate-300 */
+  color: #4b5563 !important;
 }
 
-/* Ensure active nav items and main titles are bright white */
 .cl-userPreviewMainIdentifier,
 .cl-profileSectionTitle,
 .cl-profileSectionTitleText,
@@ -194,17 +85,16 @@ body {
 .cl-breadcrumbsItem,
 .cl-navbarButton.cl-active,
 .cl-userButtonPopoverActionButtonText {
-  color: #ffffff !important;
+  color: #111827 !important;
   font-weight: 500 !important;
 }
 
-/* Explicit exceptions for primary and danger buttons */
 .cl-userProfile-root button.cl-profileSectionPrimaryButton {
-  color: #22d3ee !important; /* cyan-400 */
+  color: #2563eb !important;
 }
 
 .cl-userProfile-root .cl-danger {
-  color: #ef4444 !important; /* red-500 */
+  color: #ef4444 !important;
 }
 
 .cl-userPreviewSecondaryIdentifier,
@@ -212,14 +102,14 @@ body {
 .cl-profileSectionSubtitle,
 .cl-userButtonPopoverActionButtonIcon,
 .cl-userButtonPopoverFooterPages {
-  color: #bbbbbb !important;
+  color: #6b7280 !important;
 }
 
 .cl-navbarButton.cl-active {
-  background-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: #f3f4f6 !important;
 }
 
 .cl-navbarButton:hover,
 .cl-userButtonPopoverActionButton:hover {
-  background-color: rgba(255, 255, 255, 0.05) !important;
+  background-color: #f9fafb !important;
 }
