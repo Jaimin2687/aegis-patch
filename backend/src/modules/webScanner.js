@@ -588,21 +588,36 @@ export async function scanWebsite(targetUrl, sessionId, failoverPipeline) {
       const prompt = [
         {
           role: 'system',
-          content: `You are an expert web security consultant. Given a list of security findings from a passive website scan, provide actionable remediation recommendations. For each recommendation, include the exact configuration code or header value to implement the fix. Respond in JSON format as an array of objects: [{"title": "...", "priority": "CRITICAL|HIGH|MEDIUM", "description": "...", "fix": "exact config/code snippet to apply"}]. Return at most 5 recommendations, ordered by priority.`
+          content: `You are a web security consultant API. You MUST respond with ONLY a valid JSON array — no explanations, no markdown, no thinking tags, no prose before or after. Do NOT use <think> tags. Output ONLY the raw JSON array.
+
+Format: [{"title": "string", "priority": "CRITICAL|HIGH|MEDIUM", "description": "string", "fix": "string"}]
+
+Rules:
+- Return at most 5 recommendations ordered by priority
+- Each "fix" must contain an exact config snippet (nginx directive, meta tag, or HTTP header value)
+- Return ONLY the JSON array, nothing else`
         },
         {
           role: 'user',
-          content: `Website scanned: ${targetUrl}\nTechnology detected: ${detectedTech.map(t => t.name).join(', ') || 'Unknown'}\n\nFindings:\n${findingsSummary}\n\nProvide specific, actionable remediation recommendations with exact config snippets (e.g., nginx config, meta tags, HTTP header values).`
+          content: `Website: ${targetUrl}\nTech: ${detectedTech.map(t => t.name).join(', ') || 'Unknown'}\n\nFindings:\n${findingsSummary}\n\nReturn JSON array of remediation recommendations:`
         }
       ];
 
       const { content } = await failoverPipeline.generate(prompt, { format: 'json' });
       try {
-        const jsonStr = content.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-        recommendations = JSON.parse(jsonStr);
-        if (!Array.isArray(recommendations)) recommendations = [recommendations];
+        // The pipeline already extracts and validates JSON, but double-check
+        const parsed = JSON.parse(content);
+        recommendations = Array.isArray(parsed) ? parsed : [parsed];
       } catch {
-        logger.warn('WEB_SCAN', 'LLM recommendation JSON parsing failed');
+        // Final fallback: try regex extraction
+        const jsonMatch = content.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          try {
+            recommendations = JSON.parse(jsonMatch[0]);
+          } catch {
+            logger.warn('WEB_SCAN', 'All JSON extraction attempts failed for recommendations');
+          }
+        }
       }
     } catch (err) {
       logger.warn('WEB_SCAN', `LLM recommendation failed: ${err.message}`);

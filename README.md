@@ -71,7 +71,22 @@ Zero human intervention required. Once the tests pass, AEGIS-PATCH configures a 
 ### 💻 Real-time Execution Dashboard
 Watch the autonomous agent work. The Next.js frontend connects via WebSockets to stream the live pipeline logs, current stage indicators (CLONING → SCANNING → PATCHING → TESTING → COMPLETE), and dynamic vulnerability cards showing severity and CVSS scores as they are discovered.
 
+### 🌐 Website Vulnerability Scanner
+Perform fast, deep web application security assessments on public URLs directly from the dashboard.
+- **6 Scan Modules**:
+  - **Headers**: Audits HTTP security headers (`CSP`, `HSTS`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`) for misconfigurations and weaknesses.
+  - **SSL/TLS**: Evaluates certificate validity, issuer, expiration, protocol versions, cipher suites, and TLS strength.
+  - **Tech Detection**: Identifies server engines, backend frameworks, CMSs, and public version footprints.
+  - **Cookie Security**: Checks `Secure`, `HttpOnly`, and `SameSite` flags across all active session cookies.
+  - **Info Disclosure**: Detects exposed sensitive paths (`.env`, `.git/HEAD`, `server-status`, `elmah.axd`, `phpinfo.php`, `wp-config.php`, `swagger.json`, etc.).
+  - **AI Recommendations**: Uses the 4-Tier LLM engine to synthesize contextual remediation guidance for discovered findings.
+- **SSRF Protection**: Built-in host and IP validation blocking private ranges (`127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) and cloud metadata endpoints (`169.254.169.254`, `metadata.google.internal`).
+- **Endpoints**:
+  - `POST /api/scan-website` — Triggers a new website vulnerability scan
+  - `GET /api/scan-website/history` — Retrieves historical scan results
+
 ---
+
 
 ## 🛠️ Technology Stack
 
@@ -105,12 +120,16 @@ Watch the autonomous agent work. The Next.js frontend connects via WebSockets to
 ```mermaid
 graph TD
     A[Frontend UI] -->|POST Repo URL| B(Pipeline Orchestrator)
+    A -->|POST Target URL| W[Web Vulnerability Scanner]
+    W -->|SSRF Check & 6 Scan Modules| W1[Headers / SSL / Tech / Cookies / Info Disclosure]
+    W1 -->|Raw Findings| H[LLM Failover Engine]
+    H -->|AI Recommendations| W2[Web Scan Results & History]
     B --> C[Repo Ingestor]
     C -->|Clone & Parse Lockfile| D[Vuln Scanner]
     D -->|OSV.dev Batch Query| E{Vulns Found?}
     E -->|No| F[Complete Pipeline]
     E -->|Yes| G[Patch Synthesizer]
-    G -->|Extract vulnerable code| H[LLM Failover Engine]
+    G -->|Extract vulnerable code| H
     H -->|Groq / Cerebras / Gemini| I[Synthesize Patch]
     I --> J[Regression Engine]
     J -->|npm test| K{Tests Pass?}
@@ -126,18 +145,19 @@ graph TD
 ```
 .
 ├── backend/
-│   ├── server.js                 # HTTP + WebSocket entry point
+│   ├── server.js                 # HTTP + WebSocket entry point + Web Scanner API routes
 │   ├── src/
 │   │   ├── core/                 # Config, Pipeline Orchestrator, EventBus
 │   │   ├── llm/                  # Prompts, Failover logic, Provider integrations
-│   │   ├── modules/              # Ingestion, Scanning, Patching, Regression, PRs
+│   │   ├── modules/              # Ingestion, Scanning, Patching, Regression, PRs, webScanner.js
 │   │   └── utils/                # Logger, Process Runner, depGraph parser
 │   └── temp/                     # Isolated clone directories (auto-cleaned)
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── app/                  # Next.js App Router (page.js, globals.css, layout)
+│   │   ├── app/                  # Next.js App Router (page.js, dashboard/web-scanner/page.js, layout)
 │   │   ├── components/           # Terminal, StatusPanel, VulnCard, UrlInput
+
 │   │   └── lib/                  # WebSocket hook, Log formatters
 │   └── public/                   # Static assets
 │
@@ -195,6 +215,11 @@ FRONTEND_URL=http://localhost:3000
 MAX_RETRIES=5
 TEST_TIMEOUT_MS=30000
 MAX_MEMORY_MB=512
+
+# Web Scanner Config
+SCANNER_RESTRICT_ACCESS=false
+SCANNER_ALLOWED_EMAILS=admin@example.com
+SCANNER_RATE_LIMIT_MAX=5
 ```
 
 ### 3. Run Locally

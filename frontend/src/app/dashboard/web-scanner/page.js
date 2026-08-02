@@ -4,13 +4,21 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 
+const SvgShield = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>;
+const SvgLock = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>;
+const SvgCog = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+const SvgCookie = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-2.636-6.364M21 12c0-.34-.019-.675-.055-1.005A5 5 0 0016 6a5 5 0 00-5 5" /><circle cx="8" cy="10" r="1" fill="currentColor" /><circle cx="12" cy="14" r="1" fill="currentColor" /><circle cx="10" cy="17" r="1" fill="currentColor" /></svg>;
+const SvgSearch = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>;
+const SvgBrain = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>;
+const SvgAlert = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>;
+
 const STAGES = [
-  { id: 'HEADERS', label: 'Headers', icon: '🛡️' },
-  { id: 'SSL', label: 'SSL/TLS', icon: '🔒' },
-  { id: 'TECH', label: 'Tech Stack', icon: '⚙️' },
-  { id: 'COOKIES', label: 'Cookies', icon: '🍪' },
-  { id: 'INFO_DISCLOSURE', label: 'Info Disclosure', icon: '🔍' },
-  { id: 'AI_ANALYSIS', label: 'AI Analysis', icon: '🤖' }
+  { id: 'HEADERS', label: 'Headers' },
+  { id: 'SSL', label: 'SSL/TLS' },
+  { id: 'TECH', label: 'Tech Stack' },
+  { id: 'COOKIES', label: 'Cookies' },
+  { id: 'INFO_DISCLOSURE', label: 'Info Disclosure' },
+  { id: 'AI_ANALYSIS', label: 'AI Analysis' }
 ];
 
 const SEVERITY_STYLES = {
@@ -239,8 +247,9 @@ export default function WebScannerPage() {
               Scan Website
             </button>
           </form>
-          <p className="mt-3 text-xs text-gray-400">
-            ⚡ Passive scan only — we send standard HTTP requests identical to a browser. No active exploitation.
+          <p className="mt-3 text-xs text-gray-400 flex items-center gap-1.5">
+            <svg className="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            Passive scan only — we send standard HTTP requests identical to a browser. No active exploitation.
           </p>
           {errorMsg && (
             <motion.div
@@ -351,17 +360,17 @@ export default function WebScannerPage() {
             {/* Summary Stats */}
             <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
-                { label: 'Total Findings', value: result.findings?.length || 0, icon: '🔍', color: 'text-gray-900' },
-                { label: 'Critical/High', value: (result.findings || []).filter(f => ['CRITICAL', 'HIGH'].includes(f.severity)).length, icon: '🚨', color: 'text-red-600' },
-                { label: 'Technologies', value: result.techStack?.length || 0, icon: '⚙️', color: 'text-blue-600' },
-                { label: 'Cookies Audited', value: result.cookies?.length || 0, icon: '🍪', color: 'text-amber-600' }
+                { label: 'Total Findings', value: result.findings?.length || 0, icon: <SvgSearch />, color: 'text-gray-900' },
+                { label: 'Critical/High', value: (result.findings || []).filter(f => ['CRITICAL', 'HIGH'].includes(f.severity)).length, icon: <SvgAlert />, color: 'text-red-600' },
+                { label: 'Technologies', value: result.techStack?.length || 0, icon: <SvgCog />, color: 'text-blue-600' },
+                { label: 'Cookies Audited', value: result.cookies?.length || 0, icon: <SvgCookie />, color: 'text-amber-600' }
               ].map((stat, i) => (
                 <motion.div
                   key={i}
                   variants={itemVariants}
                   className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
                 >
-                  <div className="text-lg mb-1">{stat.icon}</div>
+                  <div className="mb-1 text-gray-400">{stat.icon}</div>
                   <div className={`text-2xl font-black ${stat.color}`}>{stat.value}</div>
                   <div className="text-xs font-semibold text-gray-400 mt-0.5">{stat.label}</div>
                 </motion.div>

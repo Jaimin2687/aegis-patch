@@ -101,15 +101,29 @@ export class FailoverPipeline {
           }
           
           let content = result.content;
+          // Strip thinking tags (Qwen, DeepSeek etc.)
+          content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
           // Strip markdown fences
-          content = content.replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
+          content = content.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim();
 
-          // If JSON format is requested, validate it before returning
+          // If JSON format is requested, extract and validate JSON
           if (options.format === 'json') {
+             // Try direct parse first
              try {
                JSON.parse(content);
              } catch (e) {
-               throw new Error(`Invalid JSON returned by ${name}: ${e.message}`);
+               // Try to extract JSON array or object from mixed text
+               const jsonMatch = content.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
+               if (jsonMatch) {
+                 try {
+                   JSON.parse(jsonMatch[1]);
+                   content = jsonMatch[1];
+                 } catch (e2) {
+                   throw new Error(`Invalid JSON returned by ${name}: ${e.message}`);
+                 }
+               } else {
+                 throw new Error(`Invalid JSON returned by ${name}: ${e.message}`);
+               }
              }
           }
 
