@@ -18,12 +18,9 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavClick = (e, targetId) => {
-    e.preventDefault();
-    const element = document.getElementById(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const handleNavClick = (targetId) => {
+    // Rely on native CSS scroll-behavior: smooth
+    // Just close the mobile menu
     setMobileMenuOpen(false);
   };
 
@@ -43,9 +40,9 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600 dark:text-gray-400">
-          <a href="#features" onClick={(e) => handleNavClick(e, 'features')} className="hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">Features</a>
-          <a href="#how-it-works" onClick={(e) => handleNavClick(e, 'how-it-works')} className="hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">How It Works</a>
-          <a href="#architecture" onClick={(e) => handleNavClick(e, 'architecture')} className="hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">Architecture</a>
+          <a href="#features" onClick={() => handleNavClick('features')} className="hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">Features</a>
+          <a href="#how-it-works" onClick={() => handleNavClick('how-it-works')} className="hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">How It Works</a>
+          <a href="#architecture" onClick={() => handleNavClick('architecture')} className="hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">Architecture</a>
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
@@ -68,9 +65,9 @@ export default function Navbar() {
       
       {mobileMenuOpen && (
         <div className="md:hidden bg-white dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 p-4 flex flex-col gap-4">
-          <a href="#features" onClick={(e) => handleNavClick(e, 'features')} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">Features</a>
-          <a href="#how-it-works" onClick={(e) => handleNavClick(e, 'how-it-works')} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">How It Works</a>
-          <a href="#architecture" onClick={(e) => handleNavClick(e, 'architecture')} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">Architecture</a>
+          <a href="#features" onClick={() => handleNavClick('features')} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">Features</a>
+          <a href="#how-it-works" onClick={() => handleNavClick('how-it-works')} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">How It Works</a>
+          <a href="#architecture" onClick={() => handleNavClick('architecture')} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors">Architecture</a>
           <Link href="/dashboard" className="w-full text-center px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-xl shadow-sm transition-all" onClick={() => setMobileMenuOpen(false)}>
              Launch Dashboard →
           </Link>
