@@ -5,7 +5,11 @@ export const EventTypes = {
   STAGE_CHANGE: 'STAGE_CHANGE',
   VULN_FOUND: 'VULN_FOUND',
   COMPLETE: 'COMPLETE',
-  ERROR: 'ERROR'
+  ERROR: 'ERROR',
+  // Web Scanner Events
+  WEB_SCAN_STAGE: 'WEB_SCAN_STAGE',
+  WEB_SCAN_FINDING: 'WEB_SCAN_FINDING',
+  WEB_SCAN_COMPLETE: 'WEB_SCAN_COMPLETE'
 };
 
 class EventBus extends EventEmitter {

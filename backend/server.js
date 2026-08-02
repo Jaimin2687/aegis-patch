@@ -213,6 +213,131 @@ const server = http.createServer((req, res) => {
       activeSessions: clients.size,
       timestamp: new Date().toISOString()
     }));
+  } else if (req.method === 'POST' && req.url === '/api/scan-website') {
+    // ── Web Scanner: Separate rate limiter (10/hr per IP) ──
+    const clientIp = getClientIp(req);
+    const scannerRateKey = `scanner:${clientIp}`;
+    const now = Date.now();
+    const cutoff = now - RATE_LIMIT_WINDOW_MS;
+    let scannerTimestamps = rateLimitMap.get(scannerRateKey) || [];
+    scannerTimestamps = scannerTimestamps.filter(t => t > cutoff);
+    if (scannerTimestamps.length >= config.SCANNER.RATE_LIMIT_MAX) {
+      res.writeHead(429, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Website scanner rate limit exceeded (10/hour). Try again later.' }));
+      return;
+    }
+    scannerTimestamps.push(now);
+    rateLimitMap.set(scannerRateKey, scannerTimestamps);
+
+    let body = '';
+    let bodySize = 0;
+    let aborted = false;
+
+    req.on('data', chunk => {
+      bodySize += chunk.length;
+      if (bodySize > MAX_BODY_SIZE) {
+        aborted = true;
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Request body too large' }));
+        req.destroy();
+        return;
+      }
+      body += chunk.toString();
+    });
+
+    req.on('end', async () => {
+      if (aborted) return;
+      try {
+        const { url: targetUrl, userEmail } = JSON.parse(body);
+
+        // Access control: check if restricted mode is on
+        if (config.SCANNER.RESTRICT_ACCESS && config.SCANNER.ALLOWED_EMAILS.length > 0) {
+          const email = (userEmail || '').toLowerCase().trim();
+          if (!config.SCANNER.ALLOWED_EMAILS.includes(email)) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'You are not authorized to use the website scanner. Contact admin.' }));
+            return;
+          }
+        }
+
+        // URL validation
+        if (!targetUrl || typeof targetUrl !== 'string') {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Missing or invalid URL' }));
+          return;
+        }
+
+        let parsedUrl;
+        try {
+          parsedUrl = new URL(targetUrl.trim());
+          if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+            throw new Error('Invalid protocol');
+          }
+        } catch {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid URL. Must be a valid http:// or https:// URL.' }));
+          return;
+        }
+
+        const sessionId = uuidv4();
+
+        // Track in scan history
+        const scanRecord = {
+          id: sessionId,
+          type: 'website',
+          url: targetUrl.trim(),
+          date: new Date().toISOString(),
+          status: 'running',
+          grade: null,
+          score: null,
+          findingsCount: 0,
+          duration: null,
+          startTime: Date.now()
+        };
+        scanHistory.unshift(scanRecord);
+        saveHistory();
+
+        // Lazy-import scanner and LLM pipeline to avoid circular deps
+        const { scanWebsite } = await import('./src/modules/webScanner.js');
+        const { FailoverPipeline } = await import('./src/llm/failoverPipeline.js');
+
+        const pipeline = new FailoverPipeline(sessionId);
+
+        // Fire and forget
+        scanWebsite(targetUrl.trim(), sessionId, pipeline).then(result => {
+          const record = scanHistory.find(s => s.id === sessionId);
+          if (record) {
+            record.status = 'completed';
+            record.grade = result.grade;
+            record.score = result.score;
+            record.findingsCount = result.findings.length;
+            record.techStack = result.techStack;
+            record.duration = `${((Date.now() - record.startTime) / 1000).toFixed(0)}s`;
+            record.results = result;
+            saveHistory();
+          }
+        }).catch(err => {
+          console.error(`Web scan error for ${sessionId}:`, err);
+          const record = scanHistory.find(s => s.id === sessionId);
+          if (record) {
+            record.status = 'error';
+            record.duration = `${((Date.now() - record.startTime) / 1000).toFixed(0)}s`;
+            saveHistory();
+          }
+          eventBus.emitError(sessionId, err.message, 'WEB_SCAN', true);
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ sessionId, status: 'started', message: 'Website security scan started' }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+      }
+    });
+  } else if (req.method === 'GET' && req.url === '/api/scan-website/history') {
+    const webScans = scanHistory.filter(s => s.type === 'website').slice(0, 50);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(webScans));
   } else {
     res.writeHead(404);
     res.end();

@@ -33,6 +33,11 @@ const config = {
       MODEL: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
       ENDPOINT: 'https://generativelanguage.googleapis.com/v1beta/models',
     }
+  },
+  SCANNER: {
+    ALLOWED_EMAILS: (process.env.SCANNER_ALLOWED_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean),
+    RATE_LIMIT_MAX: parseInt(process.env.SCANNER_RATE_LIMIT_MAX || '10', 10),
+    RESTRICT_ACCESS: process.env.SCANNER_RESTRICT_ACCESS === 'true',  // false = all users allowed (demo mode)
   }
 };
 
