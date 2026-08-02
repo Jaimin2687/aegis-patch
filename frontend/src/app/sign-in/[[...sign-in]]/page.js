@@ -2,15 +2,15 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 relative overflow-hidden">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-gray-950 relative overflow-hidden">
 
 
       <div className="w-full max-w-md mx-auto z-10 p-4">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">
+          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
             AEGIS-PATCH
           </h1>
-          <p className="mt-2 text-sm text-gray-500 font-medium tracking-wide">
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-medium tracking-wide">
             AUTONOMOUS SECURITY PIPELINE
           </p>
         </div>
@@ -19,7 +19,7 @@ export default function Page() {
           <SignIn />
         </div>
 
-        <div className="mt-8 text-center text-xs text-gray-500">
+        <div className="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">
           By signing in, you agree to our Terms of Service and Privacy Policy.
         </div>
       </div>

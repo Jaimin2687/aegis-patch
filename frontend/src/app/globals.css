@@ -1,8 +1,27 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-mono), 'JetBrains Mono', monospace;
+}
+
+:root {
+  --clerk-primary: #111827;
+  --clerk-bg: #ffffff;
+  --clerk-input-bg: #ffffff;
+  --clerk-text: #111827;
+  --clerk-text-secondary: #4b5563;
+  --clerk-shimmer: #f3f4f6;
+}
+
+.dark {
+  --clerk-primary: #f9fafb;
+  --clerk-bg: #111827;
+  --clerk-input-bg: #1f2937;
+  --clerk-text: #f9fafb;
+  --clerk-text-secondary: #9ca3af;
+  --clerk-shimmer: #374151;
 }
 
 html {
@@ -50,66 +69,4 @@ body {
   animation: fade-up 0.4s ease-out forwards;
 }
 
-.cl-userButtonPopoverCard,
-.cl-userProfile-root,
-.cl-profilePage,
-.cl-navbar,
-.cl-pageScrollBox {
-  background-color: #ffffff !important;
-  color: #111827 !important;
-}
 
-.cl-userButtonPopoverCard *,
-.cl-userProfile-root * {
-  border-color: #e5e7eb !important;
-}
-
-.cl-userProfile-root h1,
-.cl-userProfile-root h2,
-.cl-userProfile-root h3,
-.cl-userProfile-root h4 {
-  color: #111827 !important;
-}
-
-.cl-userProfile-root p,
-.cl-userProfile-root span:not(.cl-badge),
-.cl-userProfile-root div,
-.cl-userProfile-root svg {
-  color: #4b5563 !important;
-}
-
-.cl-userPreviewMainIdentifier,
-.cl-profileSectionTitle,
-.cl-profileSectionTitleText,
-.cl-headerTitle,
-.cl-breadcrumbsItem,
-.cl-navbarButton.cl-active,
-.cl-userButtonPopoverActionButtonText {
-  color: #111827 !important;
-  font-weight: 500 !important;
-}
-
-.cl-userProfile-root button.cl-profileSectionPrimaryButton {
-  color: #2563eb !important;
-}
-
-.cl-userProfile-root .cl-danger {
-  color: #ef4444 !important;
-}
-
-.cl-userPreviewSecondaryIdentifier,
-.cl-headerSubtitle,
-.cl-profileSectionSubtitle,
-.cl-userButtonPopoverActionButtonIcon,
-.cl-userButtonPopoverFooterPages {
-  color: #6b7280 !important;
-}
-
-.cl-navbarButton.cl-active {
-  background-color: #f3f4f6 !important;
-}
-
-.cl-navbarButton:hover,
-.cl-userButtonPopoverActionButton:hover {
-  background-color: #f9fafb !important;
-}

@@ -24,7 +24,7 @@ export function SpotlightCard({ children, className, ...props }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        'relative overflow-hidden rounded-2xl bg-white border border-gray-200 shadow-sm transition-shadow hover:shadow-md',
+        'relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm transition-shadow hover:shadow-md',
         className
       )}
       {...props}
@@ -36,7 +36,7 @@ export function SpotlightCard({ children, className, ...props }) {
           background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(59, 130, 246, 0.04), transparent 40%)`,
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 dark:from-white/5 to-transparent pointer-events-none" />
       <div className="relative z-10 h-full">{children}</div>
     </div>
   );

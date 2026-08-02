@@ -41,22 +41,22 @@ export default function Terminal({ logs = [], connectionStatus = 'CLOSED' }) {
   const latestFormatted = latestLog ? formatLog(latestLog) : null;
 
   return (
-    <div className="flex flex-col rounded-xl overflow-hidden border border-gray-200 bg-white font-mono text-sm">
+    <div className="flex flex-col rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 font-mono text-sm">
       <div 
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+        className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
       >
         <div className="flex items-center gap-4">
           <div className="flex gap-2">
-            <svg className={cn("w-4 h-4 transition-transform", isExpanded ? "rotate-90 text-gray-900" : "text-gray-500")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={cn("w-4 h-4 transition-transform", isExpanded ? "rotate-90 text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
             </svg>
-            <span className="text-gray-900 font-semibold tracking-wide text-xs uppercase">Execution Logs</span>
+            <span className="text-gray-900 dark:text-gray-100 font-semibold tracking-wide text-xs uppercase">Execution Logs</span>
           </div>
           {!isExpanded && latestFormatted && (
             <div className="hidden sm:flex items-center gap-2 text-xs">
               <span className={latestFormatted.levelColor}>{latestLog.level}</span>
-              <span className="text-gray-500 truncate max-w-sm">{latestLog.message}</span>
+              <span className="text-gray-500 dark:text-gray-400 truncate max-w-sm">{latestLog.message}</span>
             </div>
           )}
         </div>
@@ -66,7 +66,7 @@ export default function Terminal({ logs = [], connectionStatus = 'CLOSED' }) {
           </Badge>
           <button 
             onClick={copyLogs}
-            className="text-gray-500 hover:text-gray-900 transition-colors p-1 rounded-md hover:bg-gray-200"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors p-1 rounded-md hover:bg-gray-200 dark:bg-gray-700"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -87,19 +87,19 @@ export default function Terminal({ logs = [], connectionStatus = 'CLOSED' }) {
             <div 
               ref={terminalRef}
               onScroll={handleScroll}
-              className="p-4 max-h-[400px] overflow-y-auto space-y-1.5 scroll-smooth custom-scrollbar bg-white"
+              className="p-4 max-h-[400px] overflow-y-auto space-y-1.5 scroll-smooth custom-scrollbar bg-white dark:bg-gray-900"
             >
               {logs.length === 0 ? (
-                <div className="text-gray-500 italic">Waiting for pipeline events...</div>
+                <div className="text-gray-500 dark:text-gray-400 italic">Waiting for pipeline events...</div>
               ) : (
                 logs.map((log, idx) => {
                   const formatted = formatLog(log);
                   return (
-                    <div key={idx} className="flex hover:bg-gray-50 px-2 py-1 rounded transition-colors group">
+                    <div key={idx} className="flex hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 px-2 py-1 rounded transition-colors group">
                       <div className="w-8 shrink-0 text-gray-400 text-right pr-3 select-none tabular-nums">
                         {idx + 1}
                       </div>
-                      <div className="w-28 shrink-0 text-gray-500 tabular-nums">
+                      <div className="w-28 shrink-0 text-gray-500 dark:text-gray-400 tabular-nums">
                         {formatted.time}
                       </div>
                       <div className="w-32 shrink-0">
@@ -110,11 +110,11 @@ export default function Terminal({ logs = [], connectionStatus = 'CLOSED' }) {
                           {log.level}
                         </span>
                       </div>
-                      <div className="w-32 shrink-0 flex items-center gap-1.5 text-gray-600">
+                      <div className="w-32 shrink-0 flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
                         <span dangerouslySetInnerHTML={{ __html: formatted.stageIcon }} />
                         <span className="text-xs uppercase tracking-wide">{log.stage}</span>
                       </div>
-                      <div className={cn("flex-1 whitespace-pre-wrap break-words", formatted.textColor || "text-gray-700")}>
+                      <div className={cn("flex-1 whitespace-pre-wrap break-words", formatted.textColor || "text-gray-700 dark:text-gray-300")}>
                         {log.message}
                       </div>
                     </div>

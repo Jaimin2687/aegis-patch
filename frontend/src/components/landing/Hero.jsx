@@ -23,9 +23,9 @@ const itemVariants = {
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-50 pt-20">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-950 pt-20">
       <Hero3D />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-50 z-0" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-50 dark:opacity-30 z-0" />
       
       <div className="container mx-auto px-4 relative z-10">
         <motion.div 
@@ -35,21 +35,21 @@ export default function Hero() {
           animate="visible"
         >
           <motion.div variants={itemVariants}>
-            <Badge className="mb-6 font-mono bg-white text-gray-700 border border-gray-300">
+            <Badge className="mb-6 font-mono bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
               v1.0.0 · Zero Human Intervention
             </Badge>
           </motion.div>
 
           <motion.h1 
             variants={itemVariants}
-            className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 text-gray-900 leading-tight"
+            className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 text-gray-900 dark:text-gray-100 leading-tight"
           >
             Autonomous<br />Security Patching
           </motion.h1>
 
           <motion.p 
             variants={itemVariants}
-            className="text-lg md:text-xl text-gray-600 max-w-2xl mb-10 leading-relaxed"
+            className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mb-10 leading-relaxed"
           >
             Submit a repository. We detect vulnerabilities, synthesize patches, run regression tests, and open Pull Requests — with zero human intervention.
           </motion.p>
@@ -64,7 +64,7 @@ export default function Hero() {
               </ShimmerButton>
             </Link>
             <Link href="https://github.com/Jaimin2687/aegis-patch" target="_blank" rel="noopener noreferrer">
-              <button className="px-8 py-4 text-base font-semibold rounded-full border border-gray-300 bg-white hover:bg-gray-100 text-gray-900 transition-all shadow-sm">
+              <button className="px-8 py-4 text-base font-semibold rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-all shadow-sm">
                 View on GitHub
               </button>
             </Link>
@@ -72,7 +72,7 @@ export default function Hero() {
 
           <motion.div 
             variants={itemVariants}
-            className="mt-20 flex flex-wrap justify-center gap-4 md:gap-12 text-sm font-medium text-gray-600"
+            className="mt-20 flex flex-wrap justify-center gap-4 md:gap-12 text-sm font-medium text-gray-600 dark:text-gray-400"
           >
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-gray-500"></div>

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { UserButton, useUser } from '@clerk/nextjs';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeToggle } from '../components/theme-toggle';
 
 export default function DashboardLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -22,19 +23,19 @@ export default function DashboardLayout({ children }) {
   ];
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-white border-r border-gray-200 text-gray-900 transition-all duration-300">
-      <div className="flex items-center justify-between p-4 h-16 border-b border-gray-200">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 dark:border-gray-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 transition-all duration-300">
+      <div className="flex items-center justify-between p-4 h-16 border-b border-gray-200 dark:border-gray-800 dark:border-gray-800">
         {!collapsed && (
-          <span className="font-bold text-lg text-gray-900 truncate">
+          <span className="font-bold text-lg text-gray-900 dark:text-gray-100 truncate">
             AEGIS-PATCH
           </span>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden md:flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+          className="hidden md:flex items-center justify-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
           aria-label="Toggle Sidebar"
         >
-          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+          <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -51,8 +52,8 @@ export default function DashboardLayout({ children }) {
               className={cn(
                 "w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 text-left cursor-pointer",
                 isActive 
-                  ? "bg-gray-100 text-gray-900 font-semibold" 
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-gray-100 dark:bg-gray-800 dark:bg-gray-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 font-semibold" 
+                  : "text-gray-500 dark:text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 dark:hover:text-gray-100"
               )}
             >
               <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -66,43 +67,46 @@ export default function DashboardLayout({ children }) {
 
       {!collapsed && (
         <div className="px-4 py-4 mb-2">
-          <div className="bg-gray-50 border border-gray-200 p-3 rounded-xl flex items-center space-x-3 shadow-sm">
+          <div className="bg-gray-50 dark:bg-gray-950 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 dark:border-gray-800 p-3 rounded-xl flex items-center space-x-3 shadow-sm">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-semibold text-gray-700">Pipeline Ready</span>
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Pipeline Ready</span>
           </div>
         </div>
       )}
 
-      <div className="p-4 border-t border-gray-200 flex items-center justify-between">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800 dark:border-gray-800 flex items-center justify-between">
         <div className={cn("flex items-center", collapsed ? "mx-auto" : "space-x-3")}>
           <UserButton afterSignOutUrl="/" appearance={{ elements: { userButtonAvatarBox: 'w-8 h-8 rounded-lg' } }} />
           {!collapsed && (
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-bold text-gray-900 truncate">{userName}</span>
-              <span className="text-xs font-medium text-gray-500">Operator</span>
+              <span className="text-sm font-bold text-gray-900 dark:text-gray-100 dark:text-gray-100 truncate">{userName}</span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 dark:text-gray-400">Operator</span>
             </div>
           )}
         </div>
         {!collapsed && (
-          <span className="text-[10px] font-mono font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md border border-gray-200">
-            v1.0.0
-          </span>
+          <div className="flex items-center space-x-2">
+            <ThemeToggle />
+            <span className="text-[10px] font-mono font-bold text-gray-500 dark:text-gray-400 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 dark:bg-gray-800 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800 dark:border-gray-700">
+              v1.0.0
+            </span>
+          </div>
         )}
       </div>
     </div>
   );
 
   return (
-    <div className="flex h-screen w-full bg-gray-50 overflow-hidden text-gray-900 font-sans">
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-50 flex items-center justify-between px-4">
-        <span className="font-bold text-lg text-gray-900">
+    <div className="flex h-screen w-full bg-gray-50 dark:bg-gray-950 dark:bg-gray-900 overflow-hidden text-gray-900 dark:text-gray-100 dark:text-gray-100 font-sans">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 dark:border-gray-800 z-50 flex items-center justify-between px-4">
+        <span className="font-bold text-lg text-gray-900 dark:text-gray-100 dark:text-gray-100">
           AEGIS-PATCH
         </span>
         <button onClick={() => setMobileOpen(true)} className="p-2">
-          <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+          <svg className="w-6 h-6 text-gray-900 dark:text-gray-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -130,7 +134,7 @@ export default function DashboardLayout({ children }) {
               <SidebarContent />
               <button 
                 onClick={() => setMobileOpen(false)}
-                className="absolute top-4 -right-12 p-2 bg-white border border-gray-200 rounded-full text-gray-900 cursor-pointer shadow-sm"
+                className="absolute top-4 -right-12 p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-full text-gray-900 dark:text-gray-100 cursor-pointer shadow-sm"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

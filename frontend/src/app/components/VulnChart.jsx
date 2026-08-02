@@ -62,11 +62,11 @@ export default function VulnChart({ severityCounts }) {
 
   if (totalVulns === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full w-full bg-gray-50 rounded-xl border border-dashed border-gray-300 p-6">
+      <div className="flex flex-col items-center justify-center h-full w-full bg-gray-50 dark:bg-gray-950 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 p-6">
         <svg className="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span className="text-gray-500 text-xs font-semibold tracking-wide uppercase">No Vulnerabilities</span>
+        <span className="text-gray-500 dark:text-gray-400 text-xs font-semibold tracking-wide uppercase">No Vulnerabilities</span>
       </div>
     );
   }
@@ -84,7 +84,7 @@ export default function VulnChart({ severityCounts }) {
       <div className="relative h-44 w-full flex justify-center items-center mt-2 mb-6">
         <Doughnut data={chartData} options={options} />
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-4xl font-extrabold text-gray-900 tracking-tighter leading-none">{totalVulns}</span>
+          <span className="text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tighter leading-none">{totalVulns}</span>
           <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mt-1">Total</span>
         </div>
       </div>
@@ -97,12 +97,12 @@ export default function VulnChart({ severityCounts }) {
             
             <div className="flex-1 flex flex-col gap-1.5">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-gray-700">{item.label}</span>
-                <span className="font-mono font-bold text-gray-900">{item.count}</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">{item.label}</span>
+                <span className="font-mono font-bold text-gray-900 dark:text-gray-100">{item.count}</span>
               </div>
               
               {/* Progress Bar */}
-              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                 <div 
                   className={`h-full ${item.color} transition-all duration-500 ease-out`} 
                   style={{ width: `${item.percentage}%` }}

@@ -197,17 +197,17 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col space-y-8 font-sans bg-gray-50 text-gray-900">
+    <div className="w-full h-full flex flex-col space-y-8 font-sans bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <header className="flex justify-between items-start flex-wrap gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Command Center</h1>
-          <p className="text-gray-500">Launch and monitor vulnerability patching pipelines.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Command Center</h1>
+          <p className="text-gray-500 dark:text-gray-400">Launch and monitor vulnerability patching pipelines.</p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={() => setShowPatGuide(!showPatGuide)}
-            className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm"
+            className="px-3.5 py-2 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm"
           >
             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -220,7 +220,7 @@ export default function DashboardPage() {
               {vulns.length > 0 && (
                 <button
                   onClick={handleExportReport}
-                  className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm"
+                  className="px-3.5 py-2 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm"
                   title="Export audit report as JSON"
                 >
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,25 +310,25 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="w-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5 relative"
+            className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm space-y-5 relative"
           >
             <div className="flex justify-between items-start gap-4">
               <div className="flex items-start gap-3">
-                <div className="p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 shrink-0">
-                  <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <div className="p-2.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-500 dark:text-gray-400 shrink-0">
+                  <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
                   </svg>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-lg font-bold text-gray-900 tracking-tight">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">
                       GitHub Personal Access Token (PAT) Setup
                     </h3>
-                    <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200">
+                    <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800">
                       Required for Pull Requests
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1 max-w-2xl leading-relaxed">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-2xl leading-relaxed">
                     AEGIS-PATCH uses your Personal Access Token to commit fix branches and open Pull Requests. Follow the 3 steps below to set up your token:
                   </p>
                 </div>
@@ -336,7 +336,7 @@ export default function DashboardPage() {
 
               <button
                 onClick={() => setShowPatGuide(false)}
-                className="text-gray-400 hover:text-gray-900 p-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0"
+                className="text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors shrink-0"
                 aria-label="Close setup guide"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,51 +346,51 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-              <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1.5 flex flex-col justify-between">
+              <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-4 rounded-xl space-y-1.5 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-gray-900 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-[11px]">1</span>
+                  <div className="flex items-center gap-2 text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center justify-center text-[11px]">1</span>
                     <span>Generate Token</span>
                   </div>
-                  <p className="text-xs text-gray-600 leading-relaxed">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                     Go to <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline font-medium">GitHub Developer Settings</a> to create a Fine-grained Token.
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1.5 flex flex-col justify-between">
+              <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-4 rounded-xl space-y-1.5 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-gray-900 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-[11px]">2</span>
+                  <div className="flex items-center gap-2 text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center justify-center text-[11px]">2</span>
                     <span>Set Permissions</span>
                   </div>
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    Under <em>Repository Permissions</em>, grant <strong className="text-gray-900">Read & write</strong> for both <strong className="text-gray-900">Contents</strong> and <strong className="text-gray-900">Pull requests</strong>.
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Under <em>Repository Permissions</em>, grant <strong className="text-gray-900 dark:text-gray-100">Read & write</strong> for both <strong className="text-gray-900 dark:text-gray-100">Contents</strong> and <strong className="text-gray-900 dark:text-gray-100">Pull requests</strong>.
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1.5 flex flex-col justify-between">
+              <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-4 rounded-xl space-y-1.5 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-gray-900 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-[11px]">3</span>
+                  <div className="flex items-center gap-2 text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center justify-center text-[11px]">3</span>
                     <span>Paste or Save Token</span>
                   </div>
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    Paste your PAT (<code className="text-gray-800 font-mono">github_pat_...</code>) in the input below.
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Paste your PAT (<code className="text-gray-800 dark:text-gray-200 font-mono">github_pat_...</code>) in the input below.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-gray-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="pt-3 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2 flex-1 max-w-xl">
                 <input
                   type="password"
                   value={userPat}
                   onChange={(e) => setUserPat(e.target.value)}
                   placeholder="Paste your GitHub Personal Access Token (github_pat_...)"
-                  className="flex-1 bg-white border border-gray-200 focus:border-gray-400 rounded-xl px-3.5 py-2 text-xs text-gray-900 placeholder-gray-400 font-mono outline-none transition-colors"
+                  className="flex-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 focus:border-gray-400 rounded-xl px-3.5 py-2 text-xs text-gray-900 dark:text-gray-100 placeholder-gray-400 font-mono outline-none transition-colors"
                 />
                 <button
                   onClick={handleSavePat}
@@ -405,7 +405,7 @@ export default function DashboardPage() {
                   href="https://github.com/settings/tokens?type=beta"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
                 >
                   <span>Generate on GitHub</span>
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -414,7 +414,7 @@ export default function DashboardPage() {
                 </a>
                 <Link
                   href="/dashboard/settings"
-                  className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 text-xs font-medium rounded-xl transition-colors flex items-center gap-1.5"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -449,13 +449,13 @@ export default function DashboardPage() {
             exit={{ opacity: 0 }}
             className="flex-1 flex flex-col items-center justify-center py-20 text-center"
           >
-            <div className="w-32 h-32 mb-6 rounded-full bg-white border border-gray-200 flex items-center justify-center relative shadow-sm">
+            <div className="w-32 h-32 mb-6 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-center relative shadow-sm">
               <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
               </svg>
             </div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">Awaiting Target</h3>
-            <p className="text-gray-500 max-w-md">
+            <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">Awaiting Target</h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-md">
               Enter a repository URL above to begin the autonomous security patching process.
             </p>
           </motion.div>
@@ -501,9 +501,9 @@ export default function DashboardPage() {
                 {/* Analytics / Chart Column */}
                 <div className="xl:col-span-1 flex flex-col gap-6">
                   {/* Severity Breakdown */}
-                  <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col">
-                    <h3 className="text-sm font-bold text-gray-900 mb-6 flex items-center gap-2">
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
                       </svg>
@@ -515,9 +515,9 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Top Vulnerable Packages */}
-                  <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col">
-                    <h3 className="text-sm font-bold text-gray-900 mb-6 flex items-center gap-2">
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                       </svg>
                       Top Affected Packages
@@ -530,9 +530,9 @@ export default function DashboardPage() {
 
                 {/* Vulnerabilities List Column */}
                 <div className="xl:col-span-3 space-y-4">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-                    <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                       Detected Vulnerabilities ({filteredVulns.length} of {vulns.length})
@@ -548,11 +548,11 @@ export default function DashboardPage() {
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Search package or CVE..."
-                          className="w-full bg-gray-50 border border-gray-200 focus:border-gray-400 rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-900 placeholder-gray-500 outline-none transition-colors"
+                          className="w-full bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 focus:border-gray-400 rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-900 dark:text-gray-100 placeholder-gray-500 outline-none transition-colors"
                         />
                       </div>
 
-                      <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-200 text-xs font-medium">
+                      <div className="flex items-center gap-1 bg-gray-50 dark:bg-gray-950 p-1 rounded-xl border border-gray-200 dark:border-gray-800 text-xs font-medium">
                         {['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(sev => {
                           const count = severityCounts[sev] || 0;
                           if (sev !== 'ALL' && count === 0) return null;
@@ -563,8 +563,8 @@ export default function DashboardPage() {
                               onClick={() => setSelectedSeverity(sev)}
                               className={`px-2.5 py-1 rounded-lg transition-all text-[11px] ${
                                 isSelected
-                                  ? 'bg-white text-gray-900 font-bold shadow-sm border border-gray-200'
-                                  : 'text-gray-500 hover:text-gray-900 hover:bg-white'
+                                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-bold shadow-sm border border-gray-200 dark:border-gray-800'
+                                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 hover:bg-white dark:bg-gray-900'
                               }`}
                             >
                               {sev} ({count})
@@ -584,7 +584,7 @@ export default function DashboardPage() {
                       </AnimatePresence>
                     </div>
                   ) : (
-                    <div className="p-8 text-center bg-white border border-gray-200 rounded-xl text-gray-500 text-sm shadow-sm">
+                    <div className="p-8 text-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-500 dark:text-gray-400 text-sm shadow-sm">
                       No vulnerabilities match your filter criteria "{searchQuery || selectedSeverity}".
                     </div>
                   )}
