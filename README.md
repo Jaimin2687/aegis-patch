@@ -225,7 +225,7 @@ AEGIS-PATCH is pre-configured with `vercel.json` and `render.yaml` for seamless 
 1. Go to [Render Dashboard](https://dashboard.render.com/) and create a **New Blueprint Instance** (or Web Service).
 2. Connect your repository. Render will auto-detect `render.yaml`.
 3. In the environment section, enter your secret API keys:
-   - `GROQ_API_KEY` and `GROQ_API_KEY_2` (optional backup)
+   - `GROQ_API_KEY` and `GROQ_API_KEY_2` (backup)
    - `CEREBRAS_API_KEY`
    - `GEMINI_API_KEY`
    - `GITHUB_TOKEN` (Must have `repo` permissions)
