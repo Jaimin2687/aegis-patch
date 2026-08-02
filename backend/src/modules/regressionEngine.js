@@ -56,9 +56,12 @@ export async function runRegression(repoPath, ecosystem, sessionId) {
       return { passed: true, exitCode: 0, stdout: 'Skipped', stderr: '', timedOut: false };
   }
 
-  await runProcess(installCmd.cmd, installCmd.args, { cwd: repoPath, timeout: 120000 }).catch(e => {
+  try {
+    await runProcess(installCmd.cmd, installCmd.args, { cwd: repoPath, timeout: 120000 });
+  } catch (e) {
     logger.warn('TESTING', `Install command failed: ${e.message}`);
-  });
+    return { passed: false, stderr: 'Dependency install failed: ' + e.message };
+  }
 
   logger.info('TESTING', `Running test suite: ${testCmd.cmd} ${testCmd.args.join(' ')}`);
   const result = await runProcess(testCmd.cmd, testCmd.args, { 

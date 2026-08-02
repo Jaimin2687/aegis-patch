@@ -21,6 +21,12 @@ let scanHistory = [];
 if (fs.existsSync(HISTORY_FILE)) {
   try {
     scanHistory = JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf-8'));
+    scanHistory.forEach(record => {
+      if (record.status === 'running') {
+        record.status = 'error';
+        record.duration = 'interrupted';
+      }
+    });
   } catch (e) {
     console.error('Failed to parse history.json, starting fresh');
   }
@@ -177,6 +183,7 @@ const server = http.createServer((req, res) => {
           startTime: Date.now()
         };
         scanHistory.unshift(scanRecord);
+        if (scanHistory.length > 100) scanHistory = scanHistory.slice(0, 100);
         saveHistory(); // Save on start
 
         // Fire and forget pipeline execution
@@ -296,6 +303,7 @@ const server = http.createServer((req, res) => {
           startTime: Date.now()
         };
         scanHistory.unshift(scanRecord);
+        if (scanHistory.length > 100) scanHistory = scanHistory.slice(0, 100);
         saveHistory();
 
         // Lazy-import scanner and LLM pipeline to avoid circular deps

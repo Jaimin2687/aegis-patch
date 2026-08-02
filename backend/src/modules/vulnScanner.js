@@ -179,7 +179,9 @@ export async function scanVulnerabilities(repoPath, lockfileData, ecosystem, fai
             }
           }
         }
-      } catch(e) {}
+      } catch(e) {
+        logger.error('SCANNING', 'Cargo/Go parse error: ' + e.message);
+      }
     } else if (ecosystem === 'Go') {
       logger.info('SCANNING', 'Running govulncheck fallback');
       const { stdout } = await runProcess('govulncheck', ['-json', './...'], { cwd: repoPath }).catch(() => ({ stdout: '' }));
@@ -203,7 +205,9 @@ export async function scanVulnerabilities(repoPath, lockfileData, ecosystem, fai
              }
            }
         }
-      } catch(e) {}
+      } catch(e) {
+        logger.error('SCANNING', 'Cargo/Go parse error: ' + e.message);
+      }
     } else if (ecosystem === 'UNIVERSAL' || ecosystem === 'C/C++' || ecosystem === 'PHP' || ecosystem === 'Java') {
       // LLM SAST Scan Fallback
       logger.info('SCANNING', `Running Universal LLM Scanner for ${ecosystem}`);

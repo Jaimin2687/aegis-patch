@@ -100,14 +100,6 @@ export async function executePipeline(repoUrl, sessionId) {
     const prResult = await generatePR(repoPath, repoUrl, vulns, regressionResult || { passed: false }, sessionId);
 
     eventBus.emitStageChange(sessionId, 'PUSHING', 'COMPLETE');
-    eventBus.emitComplete(sessionId, {
-      prUrl: prResult.prUrl,
-      patchedVulns: patchedVulnsCount,
-      testsRun: 1, // Placeholder
-      testsPassed: regressionResult?.passed ? 1 : 0,
-      totalTime: `${((Date.now() - startTime) / 1000).toFixed(1)}s`,
-      iterations: config.MAX_RETRIES
-    });
 
     return prResult;
   } catch (error) {
@@ -116,7 +108,7 @@ export async function executePipeline(repoUrl, sessionId) {
   } finally {
     if (repoPath) {
       try {
-        await fs.promises.rm(repoPath, { recursive: true, force: true });
+        fs.rmSync(repoPath, { recursive: true, force: true });
         logger.info('CLEANUP', `Removed temp directory ${repoPath}`);
       } catch (e) {
         logger.error('CLEANUP', `Failed to remove temp directory: ${e.message}`);

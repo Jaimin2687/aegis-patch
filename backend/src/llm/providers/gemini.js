@@ -57,6 +57,9 @@ export class GeminiProvider {
     }
 
     const data = JSON.parse(responseText);
+    if (!data.candidates?.length || !data.candidates[0].content?.parts?.[0]?.text) {
+      throw new ProviderError(this.name, 500, 'Empty response from Gemini');
+    }
     return {
       content: data.candidates[0].content.parts[0].text,
       tokensUsed: data.usageMetadata?.totalTokenCount || 0,
