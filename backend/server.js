@@ -164,6 +164,7 @@ const server = http.createServer((req, res) => {
         // Track scan in history
         const scanRecord = {
           id: sessionId,
+          type: 'repo',
           repo: repoUrl.replace(/^https?:\/\/(www\.)?github\.com\//, ''),
           repoUrl,
           date: new Date().toISOString(),
@@ -307,7 +308,7 @@ const server = http.createServer((req, res) => {
         scanWebsite(targetUrl.trim(), sessionId, pipeline).then(result => {
           const record = scanHistory.find(s => s.id === sessionId);
           if (record) {
-            record.status = 'completed';
+            record.status = 'success';
             record.grade = result.grade;
             record.score = result.score;
             record.findingsCount = result.findings.length;
