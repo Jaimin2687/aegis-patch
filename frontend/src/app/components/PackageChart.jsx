@@ -24,11 +24,11 @@ export default function PackageChart({ vulns = [] }) {
 
   if (sortedPackages.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 w-full bg-gray-50 dark:bg-gray-950 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 p-6">
+      <div className="flex flex-col items-center justify-center h-48 w-full bg-gray-50 dark:bg-gray-950 dark:bg-gray-950 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 dark:border-gray-700 p-6">
         <svg className="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
-        <span className="text-gray-500 dark:text-gray-400 text-xs font-semibold tracking-wide uppercase">No Packages Affected</span>
+        <span className="text-gray-500 dark:text-gray-400 dark:text-gray-400 text-xs font-semibold tracking-wide uppercase">No Packages Affected</span>
       </div>
     );
   }

@@ -45,7 +45,7 @@ export default function UrlInput({ onSubmit, isRunning }) {
           <button
             type="submit"
             disabled={isRunning}
-            className="whitespace-nowrap px-6 py-2.5 bg-white dark:bg-gray-900 text-black dark:text-gray-100 font-medium rounded-md hover:bg-gray-200 dark:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[140px]"
+            className="whitespace-nowrap px-6 py-2.5 bg-white dark:bg-gray-900 dark:bg-gray-900 text-black dark:text-gray-100 font-medium rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[140px]"
           >
             {isRunning ? (
               <>

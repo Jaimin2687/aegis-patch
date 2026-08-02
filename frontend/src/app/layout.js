@@ -44,7 +44,7 @@ import { ClerkProviderWrapper } from './components/ClerkProviderWrapper';
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
-      <body className="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased transition-colors">
+      <body className="bg-gray-50 dark:bg-gray-950 dark:bg-gray-950 text-gray-900 dark:text-gray-100 dark:text-gray-100 antialiased transition-colors">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ClerkProviderWrapper clerkAppearance={clerkAppearance}>
             {children}

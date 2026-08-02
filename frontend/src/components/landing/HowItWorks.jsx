@@ -33,7 +33,7 @@ const stepVariants = {
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 bg-white dark:bg-gray-900 relative border-t border-gray-200 dark:border-gray-800">
+    <section id="how-it-works" className="py-24 bg-white dark:bg-gray-900 dark:bg-gray-900 relative border-t border-gray-200 dark:border-gray-800 dark:border-gray-800">
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <SectionHeading 
           eyebrow="Pipeline" 
@@ -49,8 +49,8 @@ export default function HowItWorks() {
           viewport={{ once: true, margin: "-100px" }}
         >
           {/* Connecting Line */}
-          <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gray-200 dark:bg-gray-700 md:hidden"></div>
-          <div className="hidden md:block absolute top-6 left-6 right-6 h-0.5 bg-gray-200 dark:bg-gray-700"></div>
+          <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gray-200 dark:bg-gray-700 dark:bg-gray-700 md:hidden"></div>
+          <div className="hidden md:block absolute top-6 left-6 right-6 h-0.5 bg-gray-200 dark:bg-gray-700 dark:bg-gray-700"></div>
           
           {steps.map((step, idx) => (
             <motion.div 
@@ -58,15 +58,15 @@ export default function HowItWorks() {
               variants={stepVariants}
               className="relative flex md:flex-col items-start md:items-center gap-4 md:text-center w-full md:w-1/5 z-10"
             >
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 shadow-sm z-10">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white dark:bg-gray-900 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 dark:border-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 dark:text-gray-300 shadow-sm z-10">
                 {step.icon}
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2 md:justify-center">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2 flex items-center gap-2 md:justify-center">
                   <span className="text-gray-400 font-mono text-sm">0{idx + 1}</span>
                   {step.title}
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-400 text-sm leading-relaxed">{step.desc}</p>
               </div>
             </motion.div>
           ))}

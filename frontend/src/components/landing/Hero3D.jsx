@@ -5,43 +5,27 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, MeshDistortMaterial, Sphere, Environment } from '@react-three/drei';
 import { useTheme } from 'next-themes';
 
-function AnimatedBlob({ isDark }) {
+function AnimatedNoodle({ isDark }) {
   const meshRef = useRef(null);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.getElapsedTime() * 0.2;
-      meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.3;
+      meshRef.current.rotation.y += delta * 0.2;
     }
   });
 
   return (
-    <Float speed={2} rotationIntensity={1.5} floatIntensity={2}>
-      <Sphere ref={meshRef} args={[1, 64, 64]} scale={2.2} position={[4, 0, -2]}>
+    <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+      <mesh ref={meshRef}>
+        <torusKnotGeometry args={[1.5, 0.4, 128, 32]} />
         <MeshDistortMaterial
-          color={isDark ? "#4f46e5" : "#3b82f6"} // indigo-600 / blue-500
-          attach="material"
-          distort={0.4}
+          color={isDark ? "#22d3ee" : "#3b82f6"}
           speed={2}
-          roughness={0.1}
-          metalness={0.1}
-          clearcoat={1}
-          clearcoatRoughness={0.2}
-          envMapIntensity={1}
+          distort={0.3}
+          roughness={0.2}
+          metalness={0.8}
         />
-      </Sphere>
-      <Sphere args={[1, 64, 64]} scale={1.2} position={[-5, 2, -4]}>
-        <MeshDistortMaterial
-          color={isDark ? "#9333ea" : "#06b6d4"} // purple-600 / cyan-500
-          attach="material"
-          distort={0.5}
-          speed={3}
-          roughness={0.1}
-          metalness={0.1}
-          clearcoat={1}
-          clearcoatRoughness={0.2}
-        />
-      </Sphere>
+      </mesh>
     </Float>
   );
 }
@@ -56,7 +40,7 @@ export default function Hero3D() {
         <ambientLight intensity={isDark ? 0.8 : 1.5} />
         <directionalLight position={[10, 10, 5]} intensity={isDark ? 1 : 2} />
         <directionalLight position={[-10, -10, -5]} intensity={isDark ? 1.5 : 2} color={isDark ? "#c084fc" : "#60a5fa"} />
-        <AnimatedBlob isDark={isDark} />
+        <AnimatedNoodle isDark={isDark} />
         <Environment preset="city" />
       </Canvas>
     </div>
