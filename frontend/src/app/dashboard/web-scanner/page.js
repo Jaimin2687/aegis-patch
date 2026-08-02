@@ -186,18 +186,18 @@ export default function WebScannerPage() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col space-y-8 font-sans bg-gray-50 text-gray-900">
+    <div className="w-full h-full flex flex-col space-y-8 font-sans bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* Header */}
-      <header className="flex justify-between items-start flex-wrap gap-4">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pr-12 md:pr-16">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Website Scanner</h1>
-          <p className="text-gray-500">Passive security audit for any website — headers, SSL, tech stack, cookies & AI-powered remediation.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Website Scanner</h1>
+          <p className="text-gray-500 dark:text-gray-400">Passive security audit for any website — headers, SSL, tech stack, cookies & AI-powered remediation.</p>
         </div>
         {status === 'COMPLETE' && (
           <div className="flex items-center gap-3">
             <button
               onClick={handleExport}
-              className="px-3.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm"
+              className="px-3.5 py-2 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-sm"
             >
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -219,7 +219,7 @@ export default function WebScannerPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm"
+          className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm"
         >
           <form onSubmit={handleScan} className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
@@ -233,7 +233,7 @@ export default function WebScannerPage() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://example.com"
-                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all font-medium"
+                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all font-medium"
               />
             </div>
             <button
@@ -268,11 +268,11 @@ export default function WebScannerPage() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm"
+          className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm"
         >
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-gray-900">Scan Progress</h2>
-            <span className="text-xs font-mono text-gray-500">
+            <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">Scan Progress</h2>
+            <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
               {completedStages.length}/{STAGES.length} modules
             </span>
           </div>
@@ -288,7 +288,7 @@ export default function WebScannerPage() {
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                       : isActive
                       ? 'bg-gray-900 border-gray-900 text-white'
-                      : 'bg-gray-50 border-gray-200 text-gray-400'
+                      : 'bg-gray-50 dark:bg-gray-950 border-gray-200 dark:border-gray-800 text-gray-400'
                   }`}
                 >
                   {isCompleted ? (
@@ -301,7 +301,7 @@ export default function WebScannerPage() {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                   ) : (
-                    <span className="w-4 h-4 shrink-0 rounded-full border-2 border-gray-300" />
+                    <span className="w-4 h-4 shrink-0 rounded-full border-2 border-gray-300 dark:border-gray-700" />
                   )}
                   <span className="truncate">{stage.label}</span>
                 </div>
@@ -327,7 +327,7 @@ export default function WebScannerPage() {
           {/* Grade Card + Summary Stats */}
           <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Grade Ring */}
-            <div className={`bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center ${gradeStyle.glow} shadow-lg`}>
+            <div className={`bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center ${gradeStyle.glow} shadow-lg`}>
               <div className="relative w-32 h-32">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
                   <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" strokeWidth="8" />
@@ -354,13 +354,13 @@ export default function WebScannerPage() {
                   <span className="text-xs font-bold text-gray-400 mt-0.5">{result.score}/100</span>
                 </div>
               </div>
-              <p className="mt-3 text-sm font-bold text-gray-700">Security Grade</p>
+              <p className="mt-3 text-sm font-bold text-gray-700 dark:text-gray-300">Security Grade</p>
             </div>
 
             {/* Summary Stats */}
             <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
-                { label: 'Total Findings', value: result.findings?.length || 0, icon: <SvgSearch />, color: 'text-gray-900' },
+                { label: 'Total Findings', value: result.findings?.length || 0, icon: <SvgSearch />, color: 'text-gray-900 dark:text-gray-100' },
                 { label: 'Critical/High', value: (result.findings || []).filter(f => ['CRITICAL', 'HIGH'].includes(f.severity)).length, icon: <SvgAlert />, color: 'text-red-600' },
                 { label: 'Technologies', value: result.techStack?.length || 0, icon: <SvgCog />, color: 'text-blue-600' },
                 { label: 'Cookies Audited', value: result.cookies?.length || 0, icon: <SvgCookie />, color: 'text-amber-600' }
@@ -368,7 +368,7 @@ export default function WebScannerPage() {
                 <motion.div
                   key={i}
                   variants={itemVariants}
-                  className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
+                  className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm"
                 >
                   <div className="mb-1 text-gray-400">{stat.icon}</div>
                   <div className={`text-2xl font-black ${stat.color}`}>{stat.value}</div>
@@ -381,7 +381,7 @@ export default function WebScannerPage() {
           {/* Findings */}
           {result.findings && result.findings.length > 0 && (
             <motion.div variants={itemVariants}>
-              <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-red-500" />
                 Security Findings ({result.findings.length})
               </h2>
@@ -393,11 +393,11 @@ export default function WebScannerPage() {
                     <motion.div
                       key={idx}
                       variants={itemVariants}
-                      className={`bg-white border ${sev.border} rounded-xl overflow-hidden shadow-sm transition-all`}
+                      className={`bg-white dark:bg-gray-900 border ${sev.border} rounded-xl overflow-hidden shadow-sm transition-all`}
                     >
                       <button
                         onClick={() => setExpandedFinding(isExpanded ? null : idx)}
-                        className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 transition-colors"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${sev.dot}`} />
@@ -405,7 +405,7 @@ export default function WebScannerPage() {
                             {finding.severity}
                           </span>
                           <span className="text-xs font-mono text-gray-400 shrink-0">{finding.module}</span>
-                          <span className="text-sm font-semibold text-gray-800 truncate">{finding.title}</span>
+                          <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">{finding.title}</span>
                         </div>
                         <svg
                           className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
@@ -420,10 +420,10 @@ export default function WebScannerPage() {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="border-t border-gray-100"
+                            className="border-t border-gray-100 dark:border-gray-800"
                           >
                             <div className="p-4 space-y-3 text-sm">
-                              <p className="text-gray-600">{finding.description}</p>
+                              <p className="text-gray-600 dark:text-gray-400">{finding.description}</p>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div className="bg-red-50 border border-red-100 rounded-lg p-3">
                                   <div className="text-[10px] font-bold text-red-400 uppercase mb-1">Current</div>
@@ -448,11 +448,11 @@ export default function WebScannerPage() {
           {/* Passes */}
           {result.passes && result.passes.length > 0 && (
             <motion.div variants={itemVariants}>
-              <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 Passed Checks ({result.passes.length})
               </h2>
-              <div className="bg-white border border-emerald-200 rounded-xl p-4 shadow-sm">
+              <div className="bg-white dark:bg-gray-900 border border-emerald-200 rounded-xl p-4 shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                   {result.passes.map((pass, idx) => (
                     <div key={idx} className="flex items-center gap-2 text-sm text-emerald-700">
@@ -470,16 +470,16 @@ export default function WebScannerPage() {
           {/* Tech Stack */}
           {result.techStack && result.techStack.length > 0 && (
             <motion.div variants={itemVariants}>
-              <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-blue-500" />
                 Detected Technologies ({result.techStack.length})
               </h2>
-              <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm">
                 <div className="flex flex-wrap gap-2">
                   {result.techStack.map((tech, idx) => (
                     <div
                       key={idx}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${CATEGORY_COLORS[tech.category] || 'bg-gray-100 text-gray-700'}`}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${CATEGORY_COLORS[tech.category] || 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
                     >
                       <span>{tech.name}</span>
                       <span className="opacity-50">•</span>
@@ -494,29 +494,29 @@ export default function WebScannerPage() {
           {/* Cookie Security */}
           {result.cookies && result.cookies.length > 0 && (
             <motion.div variants={itemVariants}>
-              <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-500" />
                 Cookie Security ({result.cookies.length})
               </h2>
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="text-left px-4 py-3 font-bold text-gray-600 text-xs uppercase">Cookie</th>
-                      <th className="text-center px-4 py-3 font-bold text-gray-600 text-xs uppercase">Secure</th>
-                      <th className="text-center px-4 py-3 font-bold text-gray-600 text-xs uppercase">HttpOnly</th>
-                      <th className="text-center px-4 py-3 font-bold text-gray-600 text-xs uppercase">SameSite</th>
-                      <th className="text-left px-4 py-3 font-bold text-gray-600 text-xs uppercase">Issues</th>
+                    <tr className="bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+                      <th className="text-left px-4 py-3 font-bold text-gray-600 dark:text-gray-400 text-xs uppercase">Cookie</th>
+                      <th className="text-center px-4 py-3 font-bold text-gray-600 dark:text-gray-400 text-xs uppercase">Secure</th>
+                      <th className="text-center px-4 py-3 font-bold text-gray-600 dark:text-gray-400 text-xs uppercase">HttpOnly</th>
+                      <th className="text-center px-4 py-3 font-bold text-gray-600 dark:text-gray-400 text-xs uppercase">SameSite</th>
+                      <th className="text-left px-4 py-3 font-bold text-gray-600 dark:text-gray-400 text-xs uppercase">Issues</th>
                     </tr>
                   </thead>
                   <tbody>
                     {result.cookies.map((cookie, idx) => (
-                      <tr key={idx} className="border-b border-gray-100 last:border-0">
-                        <td className="px-4 py-3 font-mono text-xs font-bold text-gray-800 max-w-[200px] truncate">{cookie.name}</td>
+                      <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+                        <td className="px-4 py-3 font-mono text-xs font-bold text-gray-800 dark:text-gray-200 max-w-[200px] truncate">{cookie.name}</td>
                         <td className="text-center px-4 py-3">{cookie.secure ? '✅' : '❌'}</td>
                         <td className="text-center px-4 py-3">{cookie.httpOnly ? '✅' : '❌'}</td>
                         <td className="text-center px-4 py-3">
-                          <span className={`text-xs font-mono font-bold ${cookie.sameSite === 'not set' ? 'text-red-500' : 'text-gray-700'}`}>
+                          <span className={`text-xs font-mono font-bold ${cookie.sameSite === 'not set' ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}`}>
                             {cookie.sameSite}
                           </span>
                         </td>
@@ -532,13 +532,13 @@ export default function WebScannerPage() {
           {/* AI Recommendations */}
           {result.recommendations && result.recommendations.length > 0 && (
             <motion.div variants={itemVariants}>
-              <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-violet-500" />
                 AI-Powered Recommendations ({result.recommendations.length})
               </h2>
               <div className="space-y-3">
                 {result.recommendations.map((rec, idx) => (
-                  <div key={idx} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                  <div key={idx} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm">
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
@@ -548,22 +548,22 @@ export default function WebScannerPage() {
                         }`}>
                           {rec.priority}
                         </span>
-                        <h3 className="text-sm font-bold text-gray-900">{rec.title}</h3>
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">{rec.title}</h3>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">{rec.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{rec.description}</p>
                     {rec.fix && (
-                      <div className="relative bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-                        <div className="flex items-center justify-between px-3 py-1.5 bg-gray-100 border-b border-gray-200">
-                          <span className="text-[10px] font-bold text-gray-500 uppercase">Fix</span>
+                      <div className="relative bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+                        <div className="flex items-center justify-between px-3 py-1.5 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800">
+                          <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Fix</span>
                           <button
                             onClick={() => handleCopy(rec.fix, `rec-${idx}`)}
-                            className="text-[10px] font-bold text-gray-500 hover:text-gray-900 transition-colors"
+                            className="text-[10px] font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 transition-colors"
                           >
                             {copied === `rec-${idx}` ? '✓ Copied' : 'Copy'}
                           </button>
                         </div>
-                        <pre className="p-3 text-xs font-mono text-gray-800 overflow-x-auto whitespace-pre-wrap">{rec.fix}</pre>
+                        <pre className="p-3 text-xs font-mono text-gray-800 dark:text-gray-200 overflow-x-auto whitespace-pre-wrap">{rec.fix}</pre>
                       </div>
                     )}
                   </div>
@@ -579,9 +579,9 @@ export default function WebScannerPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm"
+          className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm"
         >
-          <h2 className="text-sm font-bold text-gray-900 mb-3">Live Findings</h2>
+          <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">Live Findings</h2>
           <div className="space-y-1.5 max-h-64 overflow-y-auto">
             {findings.map((f, idx) => {
               const sev = SEVERITY_STYLES[f.severity] || SEVERITY_STYLES.INFO;
@@ -589,7 +589,7 @@ export default function WebScannerPage() {
                 <div key={idx} className={`flex items-center gap-2 px-3 py-2 rounded-lg ${sev.bg} border ${sev.border}`}>
                   <span className={`w-2 h-2 rounded-full shrink-0 ${sev.dot}`} />
                   <span className={`text-[10px] font-bold uppercase shrink-0 ${sev.text}`}>{f.severity}</span>
-                  <span className="text-xs font-medium text-gray-700 truncate">{f.title}</span>
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{f.title}</span>
                 </div>
               );
             })}

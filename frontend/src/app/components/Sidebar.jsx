@@ -25,7 +25,7 @@ export default function Sidebar({ currentStage }) {
             <svg className="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            <h2 className="font-bold text-lg text-gray-900">
+            <h2 className="font-bold text-lg text-gray-900 dark:text-gray-100 dark:text-gray-100">
               AEGIS-PATCH
             </h2>
           </div>
@@ -34,7 +34,7 @@ export default function Sidebar({ currentStage }) {
 
         {/* Pipeline status indicator */}
         {stageInfo && (
-          <div className="mx-4 mt-4 px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2.5">
+          <div className="mx-4 mt-4 px-3 py-2.5 rounded-lg bg-white dark:bg-gray-900 dark:bg-gray-900/5 border border-white/10 flex items-center gap-2.5">
             <span className={`w-2 h-2 rounded-full shrink-0 animate-pulse ${stageInfo.dot}`} />
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-widest text-[#666] font-medium">Pipeline</p>
@@ -55,13 +55,13 @@ export default function Sidebar({ currentStage }) {
             <span className="flex-1 font-medium text-sm text-left">Dashboard</span>
             <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
           </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2 text-[#888] hover:text-white transition-colors rounded-lg hover:bg-white/5">
+          <button className="w-full flex items-center gap-3 px-3 py-2 text-[#888] hover:text-white transition-colors rounded-lg hover:bg-white dark:bg-gray-900 dark:bg-gray-900/5">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="font-medium text-sm">Scan History</span>
           </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2 text-[#888] hover:text-white transition-colors rounded-lg hover:bg-white/5">
+          <button className="w-full flex items-center gap-3 px-3 py-2 text-[#888] hover:text-white transition-colors rounded-lg hover:bg-white dark:bg-gray-900 dark:bg-gray-900/5">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

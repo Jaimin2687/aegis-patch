@@ -36,11 +36,11 @@ export default function StatusPanel({ currentStage, isError = false }) {
   const progressPercent = Math.max(0, Math.min(100, (stageIndex / (STAGES.length - 1)) * 100));
 
   return (
-    <div className="w-full bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm">
+    <div className="w-full bg-white dark:bg-gray-900 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 dark:border-gray-800 p-6 md:p-8 rounded-2xl shadow-sm">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center relative z-0">
         
         {/* Horizontal background track (Desktop) */}
-        <div className="hidden md:block absolute top-5 left-5 right-5 h-[2px] bg-gray-100 -z-10">
+        <div className="hidden md:block absolute top-5 left-5 right-5 h-[2px] bg-gray-100 dark:bg-gray-800 dark:bg-gray-800 -z-10">
           <div 
             className="h-full bg-blue-500 transition-all duration-700 ease-in-out" 
             style={{ width: `${progressPercent}%` }} 
@@ -48,7 +48,7 @@ export default function StatusPanel({ currentStage, isError = false }) {
         </div>
 
         {/* Vertical background track (Mobile) */}
-        <div className="block md:hidden absolute top-5 bottom-[44px] left-5 w-[2px] bg-gray-100 -z-10">
+        <div className="block md:hidden absolute top-5 bottom-[44px] left-5 w-[2px] bg-gray-100 dark:bg-gray-800 dark:bg-gray-800 -z-10">
            <div 
             className="w-full bg-blue-500 transition-all duration-700 ease-in-out" 
             style={{ height: `${progressPercent}%` }} 
@@ -96,7 +96,7 @@ export default function StatusPanel({ currentStage, isError = false }) {
               <div className="flex flex-col md:items-center">
                 <span className={cn(
                   "text-sm font-medium transition-colors duration-300",
-                  isCompleted ? "text-gray-900" : isActive ? (isErrorNode ? "text-red-600" : "text-blue-600") : "text-gray-400"
+                  isCompleted ? "text-gray-900 dark:text-gray-100 dark:text-gray-100" : isActive ? (isErrorNode ? "text-red-600" : "text-blue-600") : "text-gray-400"
                 )}>
                   {stage.label}
                 </span>

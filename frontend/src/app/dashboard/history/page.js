@@ -160,10 +160,10 @@ export default function ScanHistoryPage() {
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 20, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 200, damping: 20, delay: 0.1 } }}>
-      <SpotlightCard className="p-0 overflow-hidden bg-white border border-gray-200 shadow-sm">
+      <SpotlightCard className="p-0 overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
+            <thead className="text-xs text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
               <tr>
                 <th scope="col" className="px-6 py-4 font-medium">Target</th>
                 <th scope="col" className="px-6 py-4 font-medium">Type</th>
@@ -178,7 +178,7 @@ export default function ScanHistoryPage() {
               <AnimatePresence>
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                       <div className="flex items-center justify-center gap-2">
                         <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
@@ -190,7 +190,7 @@ export default function ScanHistoryPage() {
                   </tr>
                 ) : filteredHistory.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                       {activeTab === 'web' ? 'No website scans yet. Use the Web Scanner to audit a URL.' : activeTab === 'repo' ? 'No repo patches yet. Run a pipeline from the Dashboard.' : 'No scans yet.'}
                     </td>
                   </tr>
@@ -206,18 +206,18 @@ export default function ScanHistoryPage() {
                         animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24, delay: index * 0.03 } }}
                         exit={{ opacity: 0 }}
                         onClick={() => setSelectedScan(item)}
-                        className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors group"
+                        className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 cursor-pointer transition-colors group"
                       >
                         {/* Target */}
-                        <td className="px-6 py-4 font-medium text-gray-900">
+                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
                           <div className="flex items-center space-x-2">
                             {isWeb ? (
                               <svg className="w-4 h-4 text-cyan-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                               </svg>
                             ) : (
-                              <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                              <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12" />
                               </svg>
                             )}
                             <span className="truncate max-w-[220px] transition-colors">
@@ -228,7 +228,7 @@ export default function ScanHistoryPage() {
                         {/* Type badge */}
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
-                            isWeb ? 'bg-cyan-50 text-cyan-700 border border-cyan-200' : 'bg-violet-50 text-violet-700 border border-violet-200'
+                            isWeb ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800' : 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border border-violet-200 dark:border-violet-800'
                           }`}>
                             {isWeb ? 'Web Scan' : 'Repo Patch'}
                           </span>
@@ -265,7 +265,7 @@ export default function ScanHistoryPage() {
                           </Badge>
                         </td>
                         {/* Duration */}
-                        <td className="px-6 py-4 text-gray-500 font-mono">{item.duration || '—'}</td>
+                        <td className="px-6 py-4 text-gray-500 dark:text-gray-400 font-mono">{item.duration || '—'}</td>
                         {/* Action */}
                         <td className="px-6 py-4">
                           <button
@@ -306,46 +306,46 @@ export default function ScanHistoryPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-4xl bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden z-10 my-8 text-gray-900"
+              className="relative w-full max-w-4xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl overflow-hidden z-10 my-8 text-gray-900 dark:text-gray-100"
             >
               <div className={`h-1.5 w-full ${isWebScan(selectedScan) ? 'bg-gradient-to-r from-cyan-500 to-blue-500' : 'bg-gray-800'}`} />
 
               <div className="p-6 sm:p-8 space-y-6 max-h-[85vh] overflow-y-auto custom-scrollbar">
                 
                 {/* Header */}
-                <div className="flex justify-between items-start gap-4 pb-4 border-b border-gray-100">
+                <div className="flex justify-between items-start gap-4 pb-4 border-b border-gray-100 dark:border-gray-800">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border ${
-                        isWebScan(selectedScan) ? 'bg-cyan-50 text-cyan-700 border-cyan-200' : 'bg-violet-50 text-violet-700 border-violet-200'
+                        isWebScan(selectedScan) ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800' : 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800'
                       }`}>
                         {isWebScan(selectedScan) ? 'Website Scan' : 'Repo Patch'}
                       </span>
-                      <span className="text-xs font-mono text-gray-600 bg-gray-100 border border-gray-200 px-2.5 py-0.5 rounded-full font-semibold">
+                      <span className="text-xs font-mono text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 px-2.5 py-0.5 rounded-full font-semibold">
                         {selectedScan.id.slice(0, 8)}...
                       </span>
                       <Badge variant={((isWebScan(selectedScan) ? webStatusConfig : statusConfig)[selectedScan.status] || statusConfig.running).variant}>
                         {selectedScan.status.toUpperCase()}
                       </Badge>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 tracking-tight pt-1 flex items-center gap-2">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight pt-1 flex items-center gap-2">
                       {isWebScan(selectedScan) ? (
                         <svg className="w-6 h-6 text-cyan-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                         </svg>
                       ) : (
-                        <svg className="w-6 h-6 text-gray-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        <svg className="w-6 h-6 text-gray-500 dark:text-gray-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12" />
                         </svg>
                       )}
                       {isWebScan(selectedScan) ? selectedScan.url : selectedScan.repo}
                     </h2>
-                    <p className="text-xs text-gray-500 font-mono pt-0.5">Scanned on {formatDate(selectedScan.date)}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-mono pt-0.5">Scanned on {formatDate(selectedScan.date)}</p>
                   </div>
 
                   <button
                     onClick={() => setSelectedScan(null)}
-                    className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
+                    className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 dark:bg-gray-800 rounded-lg transition-colors shrink-0"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -353,33 +353,32 @@ export default function ScanHistoryPage() {
                   </button>
                 </div>
 
-                {/* Web Scan Detail */}
                 {isWebScan(selectedScan) ? (
                   <>
                     {/* Grade + Stats */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      <div className={`p-4 rounded-xl border text-center ${GRADE_COLORS[selectedScan.grade] || 'bg-gray-50 border-gray-200'}`}>
-                        <div className="text-3xl font-black">{selectedScan.grade || '—'}</div>
-                        <div className="text-xs font-bold mt-1 opacity-70">{selectedScan.score != null ? `${selectedScan.score}/100` : 'Score'}</div>
+                      <div className={`p-4 rounded-xl border text-center ${GRADE_COLORS[selectedScan.grade] || 'bg-gray-50 dark:bg-gray-950 border-gray-200 dark:border-gray-800'}`}>
+                        <div className="text-3xl font-black text-gray-900 dark:text-gray-100">{selectedScan.grade || '—'}</div>
+                        <div className="text-xs font-bold mt-1 opacity-70 text-gray-600 dark:text-gray-400">{selectedScan.score != null ? `${selectedScan.score}/100` : 'Score'}</div>
                       </div>
-                      <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1">
-                        <div className="text-xs text-gray-500 font-medium">Findings</div>
-                        <div className="text-2xl font-bold text-gray-900 font-mono">{selectedScan.findingsCount ?? selectedScan.results?.findings?.length ?? 0}</div>
+                      <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-4 rounded-xl space-y-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Findings</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-mono">{selectedScan.findingsCount ?? selectedScan.results?.findings?.length ?? 0}</div>
                       </div>
-                      <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1">
-                        <div className="text-xs text-gray-500 font-medium">Technologies</div>
-                        <div className="text-2xl font-bold text-gray-900 font-mono">{selectedScan.techStack?.length ?? selectedScan.results?.techStack?.length ?? 0}</div>
+                      <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-4 rounded-xl space-y-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Technologies</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-mono">{selectedScan.techStack?.length ?? selectedScan.results?.techStack?.length ?? 0}</div>
                       </div>
-                      <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1">
-                        <div className="text-xs text-gray-500 font-medium">Duration</div>
-                        <div className="text-2xl font-bold text-gray-900 font-mono">{selectedScan.duration || '—'}</div>
+                      <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-4 rounded-xl space-y-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Duration</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-mono">{selectedScan.duration || '—'}</div>
                       </div>
                     </div>
 
                     {/* Findings list */}
                     {selectedScan.results?.findings && selectedScan.results.findings.length > 0 && (
                       <div className="space-y-3">
-                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                           <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                           </svg>
@@ -387,13 +386,13 @@ export default function ScanHistoryPage() {
                         </h3>
                         <div className="space-y-2 max-h-64 overflow-y-auto">
                           {selectedScan.results.findings.map((f, idx) => (
-                            <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl">
+                            <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl">
                               <span className={`shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${SEVERITY_COLORS[f.severity] || SEVERITY_COLORS.INFO}`}>
                                 {f.severity}
                               </span>
                               <div className="min-w-0">
-                                <div className="text-sm font-semibold text-gray-800">{f.title}</div>
-                                <div className="text-xs text-gray-500 mt-0.5">{f.module} — {f.description}</div>
+                                <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{f.title}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{f.module} — {f.description}</div>
                               </div>
                             </div>
                           ))}
@@ -404,10 +403,10 @@ export default function ScanHistoryPage() {
                     {/* Passed checks */}
                     {selectedScan.results?.passes && selectedScan.results.passes.length > 0 && (
                       <div>
-                        <h3 className="text-sm font-semibold text-emerald-700 mb-2">Passed Checks ({selectedScan.results.passes.length})</h3>
+                        <h3 className="text-sm font-semibold text-emerald-700 dark:text-emerald-500 mb-2">Passed Checks ({selectedScan.results.passes.length})</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                           {selectedScan.results.passes.map((p, idx) => (
-                            <div key={idx} className="flex items-center gap-2 text-xs text-emerald-700">
+                            <div key={idx} className="flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-500">
                               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                               </svg>
@@ -421,10 +420,10 @@ export default function ScanHistoryPage() {
                     {/* Tech stack */}
                     {(selectedScan.techStack || selectedScan.results?.techStack) && (selectedScan.techStack || selectedScan.results?.techStack).length > 0 && (
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-700 mb-2">Detected Technologies</h3>
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Detected Technologies</h3>
                         <div className="flex flex-wrap gap-1.5">
                           {(selectedScan.techStack || selectedScan.results?.techStack).map((t, idx) => (
-                            <span key={idx} className="px-2.5 py-1 bg-gray-100 border border-gray-200 rounded-lg text-xs font-bold text-gray-700">
+                            <span key={idx} className="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold text-gray-700 dark:text-gray-300">
                               {t.name} <span className="opacity-50 font-medium">• {t.category}</span>
                             </span>
                           ))}
@@ -435,20 +434,20 @@ export default function ScanHistoryPage() {
                     {/* AI Recommendations */}
                     {selectedScan.results?.recommendations && selectedScan.results.recommendations.length > 0 && (
                       <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-gray-700">AI Recommendations ({selectedScan.results.recommendations.length})</h3>
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">AI Recommendations ({selectedScan.results.recommendations.length})</h3>
                         {selectedScan.results.recommendations.map((rec, idx) => (
-                          <div key={idx} className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2">
+                          <div key={idx} className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-4 space-y-2">
                             <div className="flex items-center gap-2">
                               <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
                                 rec.priority === 'CRITICAL' ? 'bg-red-100 text-red-700' :
                                 rec.priority === 'HIGH' ? 'bg-orange-100 text-orange-700' :
                                 'bg-amber-100 text-amber-700'
                               }`}>{rec.priority}</span>
-                              <span className="text-sm font-semibold text-gray-800">{rec.title}</span>
+                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{rec.title}</span>
                             </div>
-                            <p className="text-xs text-gray-500">{rec.description}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{rec.description}</p>
                             {rec.fix && (
-                              <pre className="bg-white border border-gray-200 rounded-lg p-3 text-xs font-mono text-gray-700 overflow-x-auto whitespace-pre-wrap">{rec.fix}</pre>
+                              <pre className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-3 text-xs font-mono text-gray-700 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap">{rec.fix}</pre>
                             )}
                           </div>
                         ))}
@@ -456,21 +455,20 @@ export default function ScanHistoryPage() {
                     )}
                   </>
                 ) : (
-                  /* Repo Scan Detail (existing) */
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1">
-                        <div className="text-xs text-gray-500 font-medium">Vulnerabilities Detected</div>
-                        <div className="text-2xl font-bold text-gray-900 font-mono">{selectedScan.vulnsFound}</div>
+                      <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-4 rounded-xl space-y-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Vulnerabilities Detected</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-mono">{selectedScan.vulnsFound}</div>
                       </div>
 
-                      <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1">
-                        <div className="text-xs text-gray-500 font-medium">Pipeline Duration</div>
-                        <div className="text-2xl font-bold text-gray-900 font-mono">{selectedScan.duration || '—'}</div>
+                      <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-4 rounded-xl space-y-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Pipeline Duration</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-mono">{selectedScan.duration || '—'}</div>
                       </div>
 
-                      <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl space-y-1">
-                        <div className="text-xs text-gray-500 font-medium">Pull Request Status</div>
+                      <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-4 rounded-xl space-y-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Pull Request Status</div>
                         {selectedScan.prUrl ? (
                           <a
                             href={selectedScan.prUrl}
@@ -484,17 +482,19 @@ export default function ScanHistoryPage() {
                             </svg>
                           </a>
                         ) : (
-                          <div className="text-sm text-gray-500 pt-1">No PR generated</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400 pt-1">No PR generated</div>
                         )}
                       </div>
                     </div>
 
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                        Detected Vulnerabilities ({selectedScan.vulns ? selectedScan.vulns.length : selectedScan.vulnsFound})
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center justify-between">
+                        <span className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                          Detected Vulnerabilities ({selectedScan.vulns ? selectedScan.vulns.length : selectedScan.vulnsFound})
+                        </span>
                       </h3>
 
                       {selectedScan.vulns && selectedScan.vulns.length > 0 ? (
@@ -504,7 +504,7 @@ export default function ScanHistoryPage() {
                           ))}
                         </div>
                       ) : (
-                        <div className="bg-gray-50 border border-gray-200 p-6 rounded-xl text-center text-gray-500 space-y-1">
+                        <div className="bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-6 rounded-xl text-center text-gray-500 dark:text-gray-400 space-y-1">
                           <p className="text-sm font-medium">Summary Report Only</p>
                           <p className="text-xs text-gray-400">
                             {selectedScan.vulnsFound > 0 
@@ -519,7 +519,7 @@ export default function ScanHistoryPage() {
                       <div className="space-y-3 pt-2">
                         <button
                           onClick={() => setShowLogs((v) => !v)}
-                          className="text-xs text-gray-500 hover:text-gray-900 flex items-center gap-2 font-medium transition-colors"
+                          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 flex items-center gap-2 font-medium transition-colors"
                         >
                           <svg className={`w-4 h-4 transform transition-transform ${showLogs ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -537,13 +537,13 @@ export default function ScanHistoryPage() {
                   </>
                 )}
 
-                <div className="pt-4 flex items-center justify-between gap-4 border-t border-gray-200">
+                <div className="pt-4 flex items-center justify-between gap-4 border-t border-gray-200 dark:border-gray-800">
                   {!isWebScan(selectedScan) ? (
                     <button
                       onClick={() => handleOpenActiveWorkspace(selectedScan)}
-                      className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 hover:text-gray-900 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm"
+                      className="px-4 py-2 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 dark:text-gray-100 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm"
                     >
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
@@ -563,9 +563,9 @@ export default function ScanHistoryPage() {
                         }
                       }}
                       disabled={!selectedScan.results}
-                      className="px-4 py-2 bg-white hover:bg-gray-50 disabled:opacity-40 border border-gray-300 text-gray-700 hover:text-gray-900 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm"
+                      className="px-4 py-2 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 text-xs font-semibold rounded-xl flex items-center gap-2 transition-all shadow-sm"
                     >
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                       <span>Export Full Report</span>

@@ -37,7 +37,7 @@ const cardVariants = {
 
 export default function Features() {
   return (
-    <section id="features" className="py-24 bg-gray-50 relative border-t border-gray-200">
+    <section id="features" className="py-24 bg-gray-50 dark:bg-gray-950 dark:bg-gray-950 relative border-t border-gray-200 dark:border-gray-800 dark:border-gray-800">
       <div className="container mx-auto px-4 md:px-6">
         <SectionHeading 
           eyebrow="Capabilities" 
@@ -54,12 +54,12 @@ export default function Features() {
         >
           {features.map((feature, idx) => (
             <motion.div key={idx} variants={cardVariants}>
-              <SpotlightCard className="h-full bg-white border border-gray-200 p-6 rounded-2xl flex flex-col shadow-sm">
-                <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-700 mb-4 border border-gray-200">
+              <SpotlightCard className="h-full bg-white dark:bg-gray-900 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 dark:border-gray-800 p-6 rounded-2xl flex flex-col shadow-sm">
+                <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 dark:bg-gray-800 flex items-center justify-center text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-4 border border-gray-200 dark:border-gray-800 dark:border-gray-800">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{feature.desc}</p>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 dark:text-gray-100 mb-2">{feature.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400 text-sm leading-relaxed">{feature.desc}</p>
               </SpotlightCard>
             </motion.div>
           ))}
