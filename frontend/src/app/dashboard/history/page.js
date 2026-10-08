@@ -34,6 +34,7 @@ export default function ScanHistoryPage() {
   const [showLogs, setShowLogs] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const router = useRouter();
+  const webScannerEnabled = process.env.NEXT_PUBLIC_WEB_SCANNER_ENABLED?.toLowerCase() !== 'off';
 
   useEffect(() => {
     setShowLogs(false);
@@ -110,14 +111,16 @@ export default function ScanHistoryPage() {
 
   const isWebScan = (item) => item.type === 'website';
 
-  const filteredHistory = activeTab === 'all'
-    ? history
-    : activeTab === 'repo'
-    ? history.filter(h => !isWebScan(h))
-    : history.filter(h => isWebScan(h));
+  const displayHistory = webScannerEnabled ? history : history.filter(h => !isWebScan(h));
 
-  const repoCount = history.filter(h => !isWebScan(h)).length;
-  const webCount = history.filter(h => isWebScan(h)).length;
+  const filteredHistory = activeTab === 'all'
+    ? displayHistory
+    : activeTab === 'repo'
+    ? displayHistory.filter(h => !isWebScan(h))
+    : displayHistory.filter(h => isWebScan(h));
+
+  const repoCount = displayHistory.filter(h => !isWebScan(h)).length;
+  const webCount = displayHistory.filter(h => isWebScan(h)).length;
 
   return (
     <motion.div 
@@ -129,7 +132,10 @@ export default function ScanHistoryPage() {
         <SectionHeading 
           eyebrow="Audit Log" 
           title="Scan History" 
-          subtitle="Review past autonomous patching pipelines & website vulnerability scans."
+          subtitle={webScannerEnabled 
+            ? "Review past autonomous patching pipelines & website vulnerability scans."
+            : "Review past autonomous patching pipelines."
+          }
         />
       </motion.div>
 
@@ -137,9 +143,9 @@ export default function ScanHistoryPage() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.05 } }}>
         <div className="flex items-center gap-2">
           {[
-            { key: 'all', label: 'All Scans', count: history.length },
+            { key: 'all', label: 'All Scans', count: displayHistory.length },
             { key: 'repo', label: 'Repo Patches', count: repoCount },
-            { key: 'web', label: 'Website Scans', count: webCount },
+            ...(webScannerEnabled ? [{ key: 'web', label: 'Website Scans', count: webCount }] : []),
           ].map(tab => (
             <button
               key={tab.key}
